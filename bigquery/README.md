@@ -1,8 +1,8 @@
 # TPC-H on BigQuery
 
-Loads the TPC-H dataset (sf10 / sf100 / sf1000) from a public S3 bucket into BigQuery, plus the standard 22-query benchmark suite (fetched from ClickHouse's repo, lightly patched for BigQuery syntax).
+Loads the TPC-H dataset (sf10 / sf100 / sf1000) from a public S3 bucket into BigQuery, plus the standard 22-query benchmark suite (fetched from ClickHouse's repo and then adjusted to work with BigQuery syntax).
 
-The S3 → BigQuery hop runs on a small GCE VM rather than your laptop — the parquet files are large (sf100 lineitem alone is ~23 GB) and a wifi connection is the wrong place for that data to go.
+The S3 → BigQuery hop runs on a small GCE VM rather than your laptop, otherwise we stream the Parquet files to our machine and then back up to Google, which is very slow.
 
 ## Files
 
@@ -28,7 +28,6 @@ The S3 → BigQuery hop runs on a small GCE VM rather than your laptop — the p
 ./init.sh
 ```
 
-
 2. One-time project firewall rule allowing SSH ingress from IAP. The script will detect this and print the command if missing:
 
 ```bash
@@ -43,7 +42,10 @@ gcloud compute firewall-rules create allow-ssh-iap \
 ```bash
 SF=10  ./load_from_s3.sh --vm
 SF=100 ./load_from_s3.sh --vm
+SF=1000 ./load_from_s3.sh --vm
 ```
+
+(You probably don't need to do this, as Mark will have already loaded the data)
 
 4. Verify
 
@@ -56,10 +58,18 @@ bq query --nouse_legacy_sql --dataset_id=tpch_100 --use_cache=false 'SELECT COUN
 
 5. Tear down (when you're done)
 
+Shutdown the VM:
+
+```bash
+./load_from_s3.sh --vm-delete         # delete the VM (SF arg ignored)
+```
+
+Delete the buckets:
+
 ```bash
 SF=10  ./load_from_s3.sh --cleanup    # delete sf10 GCS staging bucket
 SF=100 ./load_from_s3.sh --cleanup    # delete sf100 GCS staging bucket
-./load_from_s3.sh --vm-delete         # delete the VM (SF arg ignored)
+SF=1000 ./load_from_s3.sh --cleanup    # delete sf1000 GCS staging bucket
 ```
 
 `--vm` is resumable: if the SSH session drops or the VM is killed mid-load, just rerun. The script:
