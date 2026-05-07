@@ -41,8 +41,11 @@ The `tee` captures full stdout/stderr to a timestamped log so you can inspect qu
 Once you've run the benchmark, you can enrich the results with pricing metatdata:
 
 ```bash
-
+./enrich.sh results/your_file.json pricings/serverless.json > results_10B/results_pricing.json
 ```
+
+> Change `results_10B` depending to `results_100B` or `results_1000B` accordingly
+
 
 ## Loading the data into BigQuery
 
