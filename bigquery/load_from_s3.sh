@@ -71,7 +71,7 @@ FIREWALL_HELP
     echo "Creating VM ${VM_NAME} in ${VM_ZONE}..."
     gcloud compute instances create "${VM_NAME}" \
       --zone="${VM_ZONE}" \
-      --machine-type=e2-medium \
+      --machine-type="${VM_MACHINE_TYPE:-e2-standard-4}" \
       --image-family=debian-12 \
       --image-project=debian-cloud \
       --boot-disk-size=20GB \
@@ -118,10 +118,11 @@ FIREWALL_HELP
   echo "Attaching to load session (tmux)..."
   REMOTE_CMD=$(cat <<EOF
 chmod +x ~/tpch_loader.sh
-if ! command -v tmux >/dev/null || ! command -v aws >/dev/null; then
-  echo "Installing tmux + awscli..."
+if ! command -v tmux >/dev/null || ! command -v aws >/dev/null \
+     || ! command -v mbuffer >/dev/null; then
+  echo "Installing tmux + awscli + mbuffer..."
   sudo apt-get update -qq
-  sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq tmux awscli
+  sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq tmux awscli mbuffer
 fi
 if ! tmux has-session -t tpch 2>/dev/null; then
   echo "Starting new tmux session 'tpch'..."
@@ -229,7 +230,10 @@ for t in "${TABLES[@]}"; do
     echo "    $f"
     success=0
     for attempt in 1 2 3 4 5; do
+      # mbuffer between aws and gcloud decouples downloader/uploader rates;
+      # 2GB ring + 64MB chunks let each side burst independently.
       if aws s3 cp --no-sign-request --only-show-errors "${S3_BASE}/${f}" - \
+        | mbuffer -q -m 2G -s 64M 2>/dev/null \
         | gcloud storage cp - "${dest}" --quiet; then
         success=1; break
       fi
