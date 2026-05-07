@@ -7,6 +7,21 @@ Loads the TPC-H dataset (sf10 / sf100 / sf1000) from a public S3 bucket into Big
 - `gcloud` CLI authenticated (`gcloud auth login`) and a default project set.
 - `bq` CLI (ships with the Cloud SDK).
 
+Initialize gcloud:
+
+```bash
+gcloud init
+```
+
+You'll need to select the project where you want to/already have BigQuery setup.
+
+Configure the following environment variables:
+
+```bash
+export PROJECT_ID=$(gcloud config get-value project)
+export USER_EMAIL=$(gcloud config get-value account)
+```
+
 ## Running the benchmark
 
 Scale factor 10
@@ -41,10 +56,10 @@ The `tee` captures full stdout/stderr to a timestamped log so you can inspect qu
 Once you've run the benchmark, you can enrich the results with pricing metatdata:
 
 ```bash
-./enrich.sh results/your_file.json pricings/serverless.json > results_10B/results_pricing.json
+./enrich.sh results/your_file.json pricings/serverless.json > results_enriched_sf10/results_enriched.json
 ```
 
-> Change `results_10B` depending to `results_100B` or `results_1000B` accordingly
+> Change `results_enriched_sf10` to `results_enriched_sf100` or `results_enriched_sf1000` accordingly
 
 
 ## Loading the data into BigQuery
