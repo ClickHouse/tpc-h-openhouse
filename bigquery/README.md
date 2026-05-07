@@ -2,25 +2,51 @@
 
 Loads the TPC-H dataset (sf10 / sf100 / sf1000) from a public S3 bucket into BigQuery, plus the standard 22-query benchmark suite (fetched from ClickHouse's repo and then adjusted to work with BigQuery syntax).
 
-The S3 → BigQuery hop runs on a small GCE VM rather than your laptop, otherwise we stream the Parquet files to our machine and then back up to Google, which is very slow.
-
-## Files
-
-| File | Purpose |
-|---|---|
-| `init.sh` | Creates the `tpch_10`, `tpch_100`, `tpch_1000` datasets and runs `init.sql` against each. |
-| `init.sql` | Canonical TPC-H schemas (STRING + `PRIMARY KEY ... NOT ENFORCED`). `CREATE OR REPLACE TABLE`, so it's idempotent. |
-| `load_from_s3.sh` | Streams parquet from S3 → GCS, two-stage `bq load` with BYTES→STRING casts, populates the schemas. Has `--vm` / `--cleanup` / `--vm-delete` modes (see below). |
-| `strip_nul_padding.sql` | Alternative to reloading — strips trailing `\0` from string columns in-place. Run if you loaded before the loader script grew the `REPLACE(..., CHR(0), '')` step. |
-| `fetch_tpch_queries.sh` | Downloads the 22 TPC-H query files from `ClickHouse/ClickHouse`, applies BigQuery-syntax patches, writes them to `queries/`. |
-| `queries.sql` / `queries/` | The benchmark queries. |
-
 ## Prerequisites
 
 - `gcloud` CLI authenticated (`gcloud auth login`) and a default project set.
 - `bq` CLI (ships with the Cloud SDK).
 
-## End-to-end load
+## Running the benchmark
+
+Scale factor 10
+
+```bash
+DATASET=tpch_10 ./run_bq_bench.sh queries 2>&1 | 
+tee logs/bench_$(date -u +%Y%m%dT%H%M%SZ).log
+```
+
+Scale factor 100
+
+```bash
+DATASET=tpch_100 ./run_bq_bench.sh queries 2>&1 | 
+tee logs/bench_$(date -u +%Y%m%dT%H%M%SZ).log
+```
+
+Scale factor 1000
+
+```bash
+DATASET=tpch_1000 ./run_bq_bench.sh queries 2>&1 | 
+tee logs/bench_$(date -u +%Y%m%dT%H%M%SZ).log
+```
+
+
+`DATASET` selects which BigQuery dataset to query (`tpch_10` / `tpch_100` / `tpch_1000`). The harness runs each of the 22 queries 3 times, captures `runtime_sec` / `billed_slot_sec` / `billed_bytes` per run, and writes a JSON results file to `results/`.
+
+The `tee` captures full stdout/stderr to a timestamped log so you can inspect query plans, raw output, and per-run timing after the fact.
+
+
+## Enriching the results
+
+Once you've run the benchmark, you can enrich the results with pricing metatdata:
+
+```bash
+
+```
+
+## Loading the data into BigQuery
+
+(You probably don't need to do this as Mark's already done it, but these are the instructions anyway!)
 
 1. Create datasets + schemas (idempotent)
 
@@ -79,7 +105,7 @@ SF=1000 ./load_from_s3.sh --cleanup    # delete sf1000 GCS staging bucket
 
 To watch a running load without re-attaching: `tmux attach -t tpch` from inside the VM, or `tail -f ~/tpch_${SF}.log`.
 
-## What the loader does
+### What the loader does
 
 1. Streams each parquet file from `s3://public-pme/join_bench/tpc-h/sf${SF}/` straight to `gs://${PROJECT_ID}-tpch-${SF}-staging/<table>/` — no local disk hop, no AWS credentials needed (public bucket).
 2. `bq load --replace` into `stage_<table>` tables (BigQuery infers the schema from parquet — produces a mix of BYTES and STRING columns).
@@ -87,23 +113,6 @@ To watch a running load without re-attaching: `tmux attach -t tpch` from inside 
 4. `DROP TABLE stage_<table>`.
 
 The staging GCS bucket is *not* deleted automatically — that's `--cleanup`'s job. This is deliberate so you can re-run the cast/transform step without re-streaming from S3.
-
-## Running the benchmark
-
-The benchmark harness lives in [`ClickHouse/Bench2Cost`](https://github.com/ClickHouse/Bench2Cost). Clone it once, then point it at the queries directory in this repo:
-
-```bash
-git clone git@github.com:ClickHouse/Bench2Cost.git
-
-DATASET=tpch_100 \
-  /path/to/Bench2Cost/bigquery/clickbench/bigquery_extended/run_bq_bench.sh \
-  $(pwd)/queries \
-  2>&1 | tee bench_$(date -u +%Y%m%dT%H%M%SZ).log
-```
-
-`DATASET` selects which BigQuery dataset to query (`tpch_10` / `tpch_100` / `tpch_1000`). The harness runs each of the 22 queries 3 times, captures `runtime_sec` / `billed_slot_sec` / `billed_bytes` per run, and writes a JSON results file to `Bench2Cost/bigquery/clickbench/bigquery_extended/results/`.
-
-The `tee` captures full stdout/stderr to a timestamped log so you can inspect query plans, raw output, and per-run timing after the fact.
 
 ## Gotchas
 
