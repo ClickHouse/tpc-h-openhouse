@@ -69,7 +69,7 @@ Once you've run the benchmark, you can enrich the results with pricing metatdata
 1. Create datasets + schemas (idempotent)
 
 ```bash
-./init.sh
+./setup/init.sh
 ```
 
 2. One-time project firewall rule allowing SSH ingress from IAP. The script will detect this and print the command if missing:
@@ -84,9 +84,9 @@ gcloud compute firewall-rules create allow-ssh-iap \
 3. Load data (one-shot per scale factor; runs on a GCE VM)
 
 ```bash
-SF=10  ./load_from_s3.sh --vm
-SF=100 ./load_from_s3.sh --vm
-SF=1000 ./load_from_s3.sh --vm
+SF=10  ./setup/load_from_s3.sh --vm
+SF=100 ./setup/load_from_s3.sh --vm
+SF=1000 ./setup/load_from_s3.sh --vm
 ```
 
 (You probably don't need to do this, as Mark will have already loaded the data)
@@ -105,15 +105,15 @@ bq query --nouse_legacy_sql --dataset_id=tpch_100 --use_cache=false 'SELECT COUN
 Shutdown the VM:
 
 ```bash
-./load_from_s3.sh --vm-delete         # delete the VM (SF arg ignored)
+./setup/load_from_s3.sh --vm-delete   # delete the VM (SF arg ignored)
 ```
 
 Delete the buckets:
 
 ```bash
-SF=10  ./load_from_s3.sh --cleanup    # delete sf10 GCS staging bucket
-SF=100 ./load_from_s3.sh --cleanup    # delete sf100 GCS staging bucket
-SF=1000 ./load_from_s3.sh --cleanup    # delete sf1000 GCS staging bucket
+SF=10  ./setup/load_from_s3.sh --cleanup   # delete sf10 GCS staging bucket
+SF=100 ./setup/load_from_s3.sh --cleanup   # delete sf100 GCS staging bucket
+SF=1000 ./setup/load_from_s3.sh --cleanup  # delete sf1000 GCS staging bucket
 ```
 
 `--vm` is resumable: if the SSH session drops or the VM is killed mid-load, just rerun. The script:
