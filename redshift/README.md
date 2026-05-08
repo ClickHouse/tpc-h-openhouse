@@ -63,6 +63,17 @@ SF=100  ./setup/load.sh
 SF=1000 ./setup/load.sh
 ```
 
+For sf1000 the laptop conversion is slow — re-encode on a same-region EC2 instead, then run `load.sh` from your laptop (the convert step skips files already in the staging bucket and only issues TRUNCATE+COPY):
+
+```bash
+SF=1000 ./setup/ec2-convert.sh up      # provision + start tmux conversion
+        ./setup/ec2-convert.sh attach  # watch progress; Ctrl-B D to detach
+        ./setup/ec2-convert.sh down    # terminate
+SF=1000 ./setup/load.sh                # back on laptop: TRUNCATE+COPY only
+```
+
+Defaults to `c7i.4xlarge` in `eu-west-3` (~$0.81/hr). Access is via AWS SSM (no SSH key, no inbound port). Install the SSM plugin if you don't have it: `brew install --cask session-manager-plugin`.
+
 For each file: `clickhouse local` reads the public-pme parquet, casts `FixedString → String` and widens integers to `Int64`, writes snappy-compressed parquet to stdout, and pipes to `aws s3 cp -` into a staging bucket (`tpch-redshift-<account>-<region>`) under per-table prefixes like `data/sf10/nation/`. Then Redshift `COPY` reads the converted prefix straight into the final table — no manifests, no stage tables.
 
 If a `COPY` fails:

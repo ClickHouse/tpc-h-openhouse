@@ -72,6 +72,14 @@ SELECTS[lineitem]='toInt64(l_orderkey), toInt64(l_partkey), toInt64(l_suppkey), 
 
 TABLES=(nation region part supplier partsupp customer orders lineitem)
 
+# Warm up the clickhouse self-extracting binary so the decompression message
+# goes to /dev/null rather than stdout where it would corrupt the first file.
+clickhouse local -q "SELECT 1" >/dev/null 2>&1 || true
+
+# Default multipart chunk size (8 MB) caps single-file uploads at 80 GB.
+# sf1000 lineitem can exceed that, so raise the ceiling to 640 GB.
+aws configure set default.s3.multipart_chunksize 64MB
+
 echo "Listing s3://${SOURCE_BUCKET}/${SOURCE_PREFIX}/ ..."
 ALL_FILES=$(aws s3 ls --no-sign-request "s3://${SOURCE_BUCKET}/${SOURCE_PREFIX}/" \
   | awk '/\.parquet$/ {print $4}')
@@ -97,6 +105,18 @@ for t in "${TABLES[@]}"; do
   existing=$(aws s3 ls "s3://${STAGING_BUCKET}/${dst_prefix}" --region "$REGION" 2>/dev/null \
     | awk '{print $4}' || true)
 
+  # Pipe stage visibility: clickhouse --progress prints rows/bytes read
+  # to stderr; pv (if installed) shows bytes flowing into the upload;
+  # aws s3 cp without --quiet shows multipart upload progress. All three
+  # write to stderr, so the parquet on stdout stays clean.
+  pipe_view() {
+    if command -v pv >/dev/null 2>&1; then
+      pv -N "$1"
+    else
+      cat
+    fi
+  }
+
   while IFS= read -r f; do
     [ -z "$f" ] && continue
     if echo "$existing" | grep -qxF -- "$f"; then
@@ -105,13 +125,13 @@ for t in "${TABLES[@]}"; do
     fi
     src_url="https://s3.${REGION}.amazonaws.com/${SOURCE_BUCKET}/${SOURCE_PREFIX}/${f}"
     dst_url="s3://${STAGING_BUCKET}/${dst_prefix}${f}"
-    echo "  convert ${f}..."
-    clickhouse local -q "
+    echo "  ${f}: convert + upload..."
+    clickhouse local --progress -q "
       SELECT ${SELECTS[$t]}
       FROM s3('${src_url}', NOSIGN, 'Parquet')
       FORMAT Parquet
       SETTINGS output_format_parquet_compression_method='snappy'
-    " | aws s3 cp - "${dst_url}" --quiet
+    " | pipe_view "${f}" | aws s3 cp - "${dst_url}"
   done <<< "$files"
 done
 
