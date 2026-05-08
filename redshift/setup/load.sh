@@ -101,8 +101,17 @@ for t in "${TABLES[@]}"; do
 
   dst_prefix="data/sf${SF}/${t}/"
 
+  # Already-converted files in the staging bucket. aws s3 cp via multipart
+  # commits atomically, so any object present here is fully uploaded.
+  existing=$(aws s3 ls "s3://${STAGING_BUCKET}/${dst_prefix}" --region "$REGION" 2>/dev/null \
+    | awk '{print $4}' || true)
+
   while IFS= read -r f; do
     [ -z "$f" ] && continue
+    if echo "$existing" | grep -qxF -- "$f"; then
+      echo "  ${f} (already converted, skipping)"
+      continue
+    fi
     src_url="https://s3.${REGION}.amazonaws.com/${SOURCE_BUCKET}/${SOURCE_PREFIX}/${f}"
     dst_url="s3://${STAGING_BUCKET}/${dst_prefix}${f}"
     echo "  convert ${f}..."
@@ -114,8 +123,10 @@ for t in "${TABLES[@]}"; do
     " | aws s3 cp - "${dst_url}" --quiet
   done <<< "$files"
 
+  # TRUNCATE before COPY so re-runs don't accumulate duplicates.
   echo "  COPY ${SCHEMA}.${t} ..."
-  "${PSQL[@]}" -c "COPY ${SCHEMA}.${t} \
+  "${PSQL[@]}" -c "TRUNCATE TABLE ${SCHEMA}.${t}; \
+    COPY ${SCHEMA}.${t} \
     FROM 's3://${STAGING_BUCKET}/${dst_prefix}' \
     IAM_ROLE '${ROLE_ARN}' \
     FORMAT AS PARQUET \
