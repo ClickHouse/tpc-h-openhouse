@@ -1,0 +1,50 @@
+
+
+
+./create_warehouses.sh
+
+
+
+
+WAREHOUSE=BENCH2COST_MEDIUM ./load_scale.sh sf10
+
+mkdir -p results_sf10
+
+WAREHOUSE=BENCH2COST_4XLARGE ./run.sh sf10 TPCH_BENCH "4X-Large" 128 \
+  > results_sf10/snowflake_sf10_4xl.json
+
+
+mkdir -p results_enriched_sf10
+./enrich.sh results_sf10/snowflake_sf10_4xl.json \
+               pricings/standard_warehouse.json \
+               results_enriched_sf10/snowflake_sf10_4xl_enriched.json \
+               --cloud aws --region us-east-1
+
+
+
+
+
+
+
+
+WAREHOUSE=BENCH2COST_MEDIUM ./load_scale.sh sf100
+
+mkdir -p results_sf100
+
+WAREHOUSE=BENCH2COST_4XLARGE ./run.sh sf100 TPCH_BENCH "4X-Large" 128 \
+  > results_sf100/snowflake_sf100_4xl.json
+
+
+mkdir -p results_enriched_sf100
+./enrich.sh results_sf100/snowflake_sf100_4xl.json \
+               pricings/standard_warehouse.json \
+               results_enriched_sf100/snowflake_sf100_4xl_enriched.json \
+               --cloud aws --region us-east-1
+
+
+
+
+WAREHOUSE=BENCH2COST_MEDIUM ./load_scale.sh sf1000
+
+
+
