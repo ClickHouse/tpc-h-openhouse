@@ -1,0 +1,42 @@
+Step 1 - create network policy - run this in a project in the Snowflake web-ui
+
+
+USE ROLE ACCOUNTADMIN;
+
+CREATE DATABASE IF NOT EXISTS SECURITYDB;
+CREATE SCHEMA IF NOT EXISTS SECURITYDB.NETWORK_RULES;
+
+CREATE OR REPLACE NETWORK RULE SECURITYDB.NETWORK_RULES.ALLOW_ALL_IPV4_RULE
+  MODE = INGRESS
+  TYPE = IPV4
+  VALUE_LIST = ('0.0.0.0/0')
+  COMMENT = 'Allows inbound Snowflake access from all IPv4 addresses';
+
+CREATE OR REPLACE NETWORK POLICY ALLOW_ALL_IPV4_POLICY
+  ALLOWED_NETWORK_RULE_LIST = ('SECURITYDB.NETWORK_RULES.ALLOW_ALL_IPV4_RULE')
+  COMMENT = 'Network policy allowing all IPv4 inbound traffic';
+
+ALTER USER TOM SET NETWORK_POLICY = ALLOW_ALL_IPV4_POLICY;
+
+
+
+Step 2 - Create Authentication token in the Snowflake web-ui
+
+Click on your user on the bottom left - Settings - Authentication - Programmatic access tokens - Generate token
+-> use this token as your password for snowsql
+
+
+Step 3 - install snwosql on the client machine
+
+curl -O https://sfc-repo.snowflakecomputing.com/snowsql/bootstrap/1.2/linux_x86_64/snowsql-1.2.22-linux_x86_64.bash
+bash snowsql-1.2.22-linux_x86_64.bash
+
+
+Step 4 - set environment variables for all script runs on the client machine
+
+e.g.
+
+export SNOWSQL_ACCOUNT="ixhmfwu-wp08988"
+export SNOWSQL_USER="TOM"
+export SNOWSQL_PWD="token"
+
