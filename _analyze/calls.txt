@@ -1,0 +1,5 @@
+./ingest_results.sh --reset bench2cost_tcph_sf10 costs .. results_enriched_sf10
+
+./ingest_results.sh --reset bench2cost_tcph_sf100 costs .. results_enriched_sf100
+
+./ingest_results.sh --reset bench2cost_tcph_sf1000 costs .. results_enriched_sf1000
