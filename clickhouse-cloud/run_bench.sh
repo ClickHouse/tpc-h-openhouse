@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 #
-# Run ClickHouse TPC-H queries 3x each and emit a JSON doc with results.
+# Run ClickHouse TPC-H queries 3x each and write a JSON doc with results.
 # - Reads each *.sql file from ./queries (sorted) as one query (multi-statement OK).
 # - Keeps the original timing/grep pipeline intact.
-# - Prints progress (stderr) and JSON (stdout).
+# - Prints progress to stderr; writes the final JSON to BOTH stdout and
+#   results/ch_<dataset>[_dqp]_<ts>.json (override dir with RESULTS_DIR env).
 #
 # Required env:
 #   DATASET   ClickHouse database to use (e.g. sf10, sf100, sf1000)
@@ -142,8 +143,14 @@ fi
 RESULT_CLEAN="$(printf "%s\n" "$RESULT_RAW" | sed '$ s/,\s*$//')"
 
 DATE_ISO="$(date -u +%F)"
+TS="$(date -u +%Y%m%dT%H%M%SZ)"
+RESULTS_DIR="${RESULTS_DIR:-$SCRIPT_DIR/results}"
+mkdir -p "$RESULTS_DIR"
+DQP_SUFFIX=""
+[[ "${DQP_FLAG}" == "1" ]] && DQP_SUFFIX="_dqp"
+OUT_FILE="$RESULTS_DIR/ch_${DATASET}${DQP_SUFFIX}_${TS}.json"
 
-cat <<JSON
+tee "$OUT_FILE" <<JSON
 {
     "system": "$SYSTEM",
     "date": "$DATE_ISO",
@@ -163,3 +170,6 @@ $RESULT_CLEAN
     ]
 }
 JSON
+
+echo "" >&2
+echo "Wrote results → $OUT_FILE" >&2
