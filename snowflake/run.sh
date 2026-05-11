@@ -216,6 +216,3 @@ $RESULT_CLEAN
   ]
 }
 JSON
-EOF
-
-chmod +x run.sh
