@@ -1,4 +1,4 @@
-CREATE VIEW revenue0 AS
+CREATE OR REPLACE VIEW revenue0 AS
     SELECT
         l_suppkey AS supplier_no,
         sum(l_extendedprice * (1 - l_discount)) AS total_revenue
@@ -22,4 +22,4 @@ WHERE (s_suppkey = supplier_no)
     ))
 ORDER BY s_suppkey;
 
-DROP VIEW revenue0;
+DROP VIEW IF EXISTS revenue0;
