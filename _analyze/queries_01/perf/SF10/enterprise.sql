@@ -36,6 +36,11 @@ sel AS
            'aws' AS provider, 'us-east-1' AS region,
            'Gen2 4X-Large' AS machine, '172.8' AS cluster_size
 
+        UNION ALL
+    -- 07: Databricks SQL Serverless (4X-Large)
+    SELECT '21' AS id, 'Databricks Ent (4X-Large)' AS bar_label, 'Databricks%' AS system_pat,
+        'premium' AS tier, NULL AS compute_model, 'aws' AS provider, 'us-east-1' AS region, 'serverless' AS machine, '4X-Large' AS cluster_size
+
 ),
 
 
