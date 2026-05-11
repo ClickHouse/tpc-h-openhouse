@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 #
-# Run ClickHouse TPC-H queries 3x each and write a JSON doc with results.
+# Run ClickHouse TPC-H queries 3x each and emit a JSON doc with results.
 # - Reads each *.sql file from ./queries (sorted) as one query (multi-statement OK).
 # - Keeps the original timing/grep pipeline intact.
-# - Prints progress to stderr; writes the final JSON to results/ch_<dataset>_<ts>.json.
+# - Prints progress (stderr) and JSON (stdout).
 #
 # Required env:
 #   DATASET   ClickHouse database to use (e.g. sf10, sf100, sf1000)
@@ -48,7 +48,7 @@ CLIENT_CONFIG="${CLIENT_CONFIG:-$SCRIPT_DIR/clickhouse-client.xml}"
 SETTINGS_PREFIX=""
 if [[ "${DQP_FLAG}" == "1" ]]; then
   # Enables distributed query plan.
-  SETTINGS_PREFIX="SET make_distributed_plan = 1, enable_cascades_optimizer = 1; "
+  SETTINGS_PREFIX="SET make_distributed_plan=1; "
 fi
 
 TRIES=3
@@ -67,9 +67,17 @@ if (( TOTAL == 0 )); then
   exit 1
 fi
 
-# --- Collect results using the original timing/grep pipeline ---
+# --- Collect results, with error detection ------------------------------
 # For multi-statement files (e.g. query_15.sql with CREATE/SELECT/DROP VIEW),
 # --time prints one decimal per statement; we sum them into a single number.
+# A run is considered FAILED if either:
+#   - clickhouse client exits non-zero, or
+#   - no timing decimal is found in the output (likely a parser/server error).
+# In both cases we print the full client output to stderr and record `null`
+# for that try, so the rest of the suite still completes.
+FAIL_LOG="$(mktemp -t ch_bench_fail.XXXXXX)"
+trap 'rm -f "$FAIL_LOG"' EXIT
+
 RESULT_RAW="$(
 for f in "${QUERY_FILES[@]}"; do
     name="$(basename "$f" .sql)"
@@ -79,15 +87,39 @@ for f in "${QUERY_FILES[@]}"; do
     echo -n "["
     ARRAY_VALUES=()
     for i in $(seq 1 $TRIES); do
-        val=$(
-          "$CLIENT_BIN" client -c "$CLIENT_CONFIG" --database "$DATASET" \
-            --time --format=Null --progress 0 --multiquery \
-            --query="$full_query" 2>&1 |
-            awk '
-              /^[0-9]+\.[0-9]+$/ { sum += $1; n++ }
-              END { if (n > 0) printf "%.3f", sum; else printf "null" }
-            '
-        )
+        tmp_out="$(mktemp -t ch_bench_out.XXXXXX)"
+        set +e
+        "$CLIENT_BIN" client -c "$CLIENT_CONFIG" --database "$DATASET" \
+          --time --format=Null --progress 0 --multiquery \
+          --query="$full_query" >"$tmp_out" 2>&1
+        rc=$?
+        set -e
+
+        val=$(awk '
+            /^[0-9]+\.[0-9]+$/ { sum += $1; n++ }
+            END { if (n > 0) printf "%.3f", sum; else printf "null" }
+        ' "$tmp_out")
+
+        err_reason=""
+        if (( rc != 0 )); then
+            err_reason="exit=${rc}"
+        elif [[ "$val" == "null" ]]; then
+            err_reason="no-timing"
+        fi
+
+        if [[ -n "$err_reason" ]]; then
+            val="null"
+            {
+              echo
+              echo "!!! ${name} run ${i}/${TRIES} FAILED (${err_reason}). Client output:"
+              sed 's/^/    | /' "$tmp_out"
+              echo
+            } >&2
+            echo "${name} run ${i}/${TRIES} FAILED (${err_reason})" >> "$FAIL_LOG"
+        fi
+
+        rm -f "$tmp_out"
+
         ARRAY_VALUES+=("$val")
         echo -n "$val"
         [[ "$i" != $TRIES ]] && echo -n ", "
@@ -97,18 +129,21 @@ for f in "${QUERY_FILES[@]}"; do
 done
 )"
 
+if [[ -s "$FAIL_LOG" ]]; then
+    fail_count=$(wc -l < "$FAIL_LOG" | tr -d ' ')
+    echo >&2
+    echo "============================================================" >&2
+    echo "FAILED RUNS: ${fail_count}" >&2
+    sed 's/^/  - /' "$FAIL_LOG" >&2
+    echo "============================================================" >&2
+fi
+
 # Make valid JSON arrays (drop trailing comma)
 RESULT_CLEAN="$(printf "%s\n" "$RESULT_RAW" | sed '$ s/,\s*$//')"
 
 DATE_ISO="$(date -u +%F)"
-TS="$(date -u +%Y%m%dT%H%M%SZ)"
-RESULTS_DIR="${RESULTS_DIR:-$SCRIPT_DIR/results}"
-mkdir -p "$RESULTS_DIR"
-DQP_SUFFIX=""
-[[ "${DQP_FLAG}" == "1" ]] && DQP_SUFFIX="_dqp"
-OUT_FILE="$RESULTS_DIR/ch_${DATASET}${DQP_SUFFIX}_${TS}.json"
 
-tee "$OUT_FILE" >/dev/null <<JSON
+cat <<JSON
 {
     "system": "$SYSTEM",
     "date": "$DATE_ISO",
@@ -128,6 +163,3 @@ $RESULT_CLEAN
     ]
 }
 JSON
-
-echo "" >&2
-echo "Wrote results → $OUT_FILE" >&2
