@@ -1,0 +1,71 @@
+
+source ~/.venvs/dbsql/bin/activate
+
+./load_scale.py sf10
+
+
+
+mkdir -p results_sf10
+
+
+python run_bench.py \
+  --scale sf10 \
+  --machine "4X-Large" \
+  --runs 3 \
+  --output runs_sf10_4xlarge.json
+
+python collect_metrics_v2.py \
+  --machine "4X-Large" \
+  --input runs_sf10_4xlarge.json \
+  --output metrics_sf10_4xlarge.json
+
+python summarize_results.py \
+  --scale sf10 \
+  --machine "4X-Large" \
+  --cluster-size 528 \
+  --input metrics_sf10_4xlarge.json \
+  --output results_sf10/databricks_sf10_4xlarge.json
+
+
+
+
+./run_full.sh sf10 "4X-Large" 528 results_sf10/databricks_sf10_4xlarge.json
+
+mkdir -p results_enriched_sf10
+./enrich.sh  results_sf10/databricks_sf10_4xlarge.json \
+            pricings/sql_serverless_compute.json \
+            results_enriched_sf10/databricks_sf10_4xlarge_enriched.json \
+            --cloud aws --region us-east-1 --plan premium
+
+
+
+
+
+
+./load_scale.py sf100
+./run_full.sh sf100 "4X-Large" 528 results_sf100/databricks_sf100_4xlarge.json
+
+mkdir -p results_enriched_sf100
+./enrich.sh  results_sf100/databricks_sf100_4xlarge.json \
+            pricings/sql_serverless_compute.json \
+            results_enriched_sf100/databricks_sf100_4xlarge_enriched.json \
+            --cloud aws --region us-east-1 --plan premium
+
+
+
+./load_scale.py sf1000
+./run_full.sh sf1000 "4X-Large" 528 results_sf1000/databricks_sf1000_4xlarge.json
+
+mkdir -p results_enriched_sf1000
+
+./enrich.sh  results_sf1000/databricks_sf1000_4xlarge.json \
+            pricings/sql_serverless_compute.json \
+            results_enriched_sf1000/databricks_sf1000_4xlarge_enriched.json \
+            --cloud aws --region us-east-1 --plan premium
+
+
+
+
+
+
+
