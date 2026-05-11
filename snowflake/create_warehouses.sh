@@ -43,7 +43,8 @@ echo "→ Verifying warehouses ..." >&2
 
 for wh in \
   BENCH2COST_MEDIUM \
-  BENCH2COST_4XLARGE
+  BENCH2COST_4XLARGE \
+  BENCH2COST_4XLARGE_GEN2
 do
   echo "→ Verifying ${wh} ..." >&2
 
