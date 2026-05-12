@@ -49,7 +49,15 @@ CLIENT_CONFIG="${CLIENT_CONFIG:-$SCRIPT_DIR/clickhouse-client.xml}"
 SETTINGS_PREFIX=""
 if [[ "${DQP_FLAG}" == "1" ]]; then
   # Enables distributed query plan.
-  SETTINGS_PREFIX="SET make_distributed_plan=1; "
+  SETTINGS_PREFIX="SET make_distributed_plan=1, enable_parallel_replicas=0, \
+  rewrite_in_to_join=1, correlated_subqueries_use_in_memory_buffer=0, \
+  allow_experimental_correlated_subqueries=1, \
+  enable_join_runtime_filters=0, \
+  query_plan_optimize_join_order_algorithm='dpsize greedy', \
+  allow_statistic_optimize=1, \
+  use_join_disjunctions_push_down=1, \
+  distributed_plan_default_shuffle_join_bucket_count=5, \
+  distributed_plan_default_reader_bucket_count=5; "
 fi
 
 TRIES=3
