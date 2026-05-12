@@ -56,6 +56,7 @@ if [[ "${DQP_FLAG}" == "1" ]]; then
   query_plan_optimize_join_order_algorithm='dpsize greedy', \
   allow_statistic_optimize=1, \
   use_join_disjunctions_push_down=1, \
+  distributed_plan_prefer_replicas_over_workers=1, \
   distributed_plan_default_shuffle_join_bucket_count=5, \
   distributed_plan_default_reader_bucket_count=5; "
 fi
