@@ -170,7 +170,7 @@ RESULTS_DIR="${RESULTS_DIR:-$SCRIPT_DIR/results}"
 mkdir -p "$RESULTS_DIR"
 DQP_SUFFIX=""
 [[ "${DQP_FLAG}" == "1" ]] && DQP_SUFFIX="_dqp"
-OUT_FILE="$RESULTS_DIR/ch_${DATASET}${DQP_SUFFIX}_${TS}.json"
+OUT_FILE="$RESULTS_DIR/ch_${DATASET}_${MACHINE}_${DQP_SUFFIX}_${TS}.json"
 
 tee "$OUT_FILE" <<JSON
 {
@@ -200,7 +200,11 @@ echo "Wrote results → $OUT_FILE" >&2
 # Best time = min over the TRIES tries (ignoring `null` / failed runs).
 # Total     = sum of per-query best times (queries with all-null tries are
 #             excluded from the sum but still listed).
-mapfile -t BEST_TIMES < <(
+# Use a read loop (not `mapfile`) so this works on macOS' default bash 3.2.
+BEST_TIMES=()
+while IFS= read -r _bt_line; do
+  BEST_TIMES+=("$_bt_line")
+done < <(
   printf '%s\n' "$RESULT_CLEAN" | awk '
     {
       line = $0
