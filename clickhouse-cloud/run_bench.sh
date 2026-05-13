@@ -83,8 +83,10 @@ fi
 # A run is considered FAILED if either:
 #   - clickhouse client exits non-zero, or
 #   - no timing decimal is found in the output (likely a parser/server error).
-# In both cases we print the full client output to stderr and record `null`
-# for that try, so the rest of the suite still completes.
+# On first failure for a given query we print the full client output to
+# stderr, record `null` for that try AND for any remaining tries (no
+# retries), then move on to the next query so the rest of the suite still
+# completes.
 FAIL_LOG="$(mktemp -t ch_bench_fail.XXXXXX)"
 trap 'rm -f "$FAIL_LOG"' EXIT
 
@@ -96,7 +98,17 @@ for f in "${QUERY_FILES[@]}"; do
     echo "Running ${name}..." >&2
     echo -n "["
     ARRAY_VALUES=()
+    failed=0
     for i in $(seq 1 $TRIES); do
+        if (( failed == 1 )); then
+            # Earlier try failed for this query; skip remaining tries.
+            val="null"
+            ARRAY_VALUES+=("$val")
+            echo -n "$val"
+            [[ "$i" != $TRIES ]] && echo -n ", "
+            continue
+        fi
+
         tmp_out="$(mktemp -t ch_bench_out.XXXXXX)"
         set +e
         "$CLIENT_BIN" client -c "$CLIENT_CONFIG" --database "$DATASET" \
@@ -119,9 +131,10 @@ for f in "${QUERY_FILES[@]}"; do
 
         if [[ -n "$err_reason" ]]; then
             val="null"
+            failed=1
             {
               echo
-              echo "!!! ${name} run ${i}/${TRIES} FAILED (${err_reason}). Client output:"
+              echo "!!! ${name} run ${i}/${TRIES} FAILED (${err_reason}). Skipping remaining tries. Client output:"
               sed 's/^/    | /' "$tmp_out"
               echo
             } >&2
@@ -182,3 +195,54 @@ JSON
 
 echo "" >&2
 echo "Wrote results → $OUT_FILE" >&2
+
+# --- Console-only summary: best-of-N per query and total time -----------
+# Best time = min over the TRIES tries (ignoring `null` / failed runs).
+# Total     = sum of per-query best times (queries with all-null tries are
+#             excluded from the sum but still listed).
+mapfile -t BEST_TIMES < <(
+  printf '%s\n' "$RESULT_CLEAN" | awk '
+    {
+      line = $0
+      gsub(/[\[\],]/, " ", line)
+      best = -1
+      n = split(line, vals, /[ \t]+/)
+      for (i = 1; i <= n; i++) {
+        v = vals[i]
+        if (v == "" || v == "null") continue
+        x = v + 0
+        if (best < 0 || x < best) best = x
+      }
+      if (best < 0) print "null"
+      else printf "%.3f\n", best
+    }
+  '
+)
+
+N_QUERIES=${#QUERY_FILES[@]}
+TOTAL_SEC="0"
+N_VALID=0
+
+echo >&2
+echo "============================================================" >&2
+echo "SUMMARY (best of ${TRIES} per query, dataset=${DATASET}, dqp=${DQP_FLAG})" >&2
+echo "============================================================" >&2
+for ((idx = 0; idx < N_QUERIES; idx++)); do
+  qname="$(basename "${QUERY_FILES[$idx]}" .sql)"
+  best="${BEST_TIMES[$idx]:-null}"
+  printf "  %-12s best = %s\n" "$qname" "$best" >&2
+  if [[ "$best" != "null" ]]; then
+    TOTAL_SEC=$(awk -v a="$TOTAL_SEC" -v b="$best" 'BEGIN { printf "%.6f", a + b }')
+    N_VALID=$((N_VALID + 1))
+  fi
+done
+
+echo "------------------------------------------------------------" >&2
+if (( N_VALID == 0 )); then
+  echo "Total time:  N/A (no successful queries)" >&2
+else
+  TOTAL_FMT=$(awk -v t="$TOTAL_SEC" 'BEGIN { printf "%.3f", t }')
+  printf "Total time:  %s sec  (sum of best times across %d/%d queries)\n" \
+    "$TOTAL_FMT" "$N_VALID" "$N_QUERIES" >&2
+fi
+echo "============================================================" >&2
