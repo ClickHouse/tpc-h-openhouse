@@ -170,7 +170,7 @@ RESULTS_DIR="${RESULTS_DIR:-$SCRIPT_DIR/results}"
 mkdir -p "$RESULTS_DIR"
 DQP_SUFFIX=""
 [[ "${DQP_FLAG}" == "1" ]] && DQP_SUFFIX="_dqp"
-OUT_FILE="$RESULTS_DIR/ch_${DATASET}_${MACHINE}_${DQP_SUFFIX}_${TS}.json"
+OUT_FILE="$RESULTS_DIR/ch_${DATASET}_${MACHINE}${DQP_SUFFIX}_${TS}.json"
 
 tee "$OUT_FILE" <<JSON
 {
