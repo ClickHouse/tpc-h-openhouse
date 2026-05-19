@@ -36,7 +36,7 @@ done
 2. Kick off the import (tmux session, sequential per scale factor, parallel per table):
 
 ```bash
-cd import && ./run_import.sh
+./import/run_import.sh
 ```
 
 Watch progress with either of:
