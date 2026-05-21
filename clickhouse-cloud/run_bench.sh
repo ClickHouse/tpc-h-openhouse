@@ -46,19 +46,27 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CLIENT_BIN="${CLIENT_BIN:-$HOME/work/clickhouse-dist/clickhouse}"
 CLIENT_CONFIG="${CLIENT_CONFIG:-$SCRIPT_DIR/clickhouse-client.xml}"
 
+# Default SET statement applied to EVERY query (baseline and DQP runs alike).
+# Edit / extend the SQL below in-place — no env var or CLI flag needed.
+# Leave as an empty string to disable the default prefix entirely.
+DEFAULT_SETTINGS_SQL="SET enable_parallel_replicas = 0; "
+
+# Extra SET statement appended after DEFAULT_SETTINGS_SQL when DQP_FLAG=1.
+DQP_SETTINGS_SQL="SET make_distributed_plan=1, enable_parallel_replicas=0, \
+rewrite_in_to_join=1, correlated_subqueries_use_in_memory_buffer=0, \
+allow_experimental_correlated_subqueries=1, \
+enable_join_runtime_filters=0, \
+query_plan_optimize_join_order_algorithm='dpsize greedy', \
+allow_statistic_optimize=1, \
+use_join_disjunctions_push_down=1, \
+distributed_plan_prefer_replicas_over_workers=1, \
+distributed_plan_default_shuffle_join_bucket_count=5, \
+distributed_plan_default_reader_bucket_count=5;"
+
 SETTINGS_PREFIX=""
+[[ -n "$DEFAULT_SETTINGS_SQL" ]] && SETTINGS_PREFIX="${DEFAULT_SETTINGS_SQL} "
 if [[ "${DQP_FLAG}" == "1" ]]; then
-  # Enables distributed query plan.
-  SETTINGS_PREFIX="SET make_distributed_plan=1, enable_parallel_replicas=0, \
-  rewrite_in_to_join=1, correlated_subqueries_use_in_memory_buffer=0, \
-  allow_experimental_correlated_subqueries=1, \
-  enable_join_runtime_filters=0, \
-  query_plan_optimize_join_order_algorithm='dpsize greedy', \
-  allow_statistic_optimize=1, \
-  use_join_disjunctions_push_down=1, \
-  distributed_plan_prefer_replicas_over_workers=1, \
-  distributed_plan_default_shuffle_join_bucket_count=5, \
-  distributed_plan_default_reader_bucket_count=5; "
+  SETTINGS_PREFIX="${SETTINGS_PREFIX}${DQP_SETTINGS_SQL} "
 fi
 
 TRIES=3
@@ -172,6 +180,7 @@ DQP_SUFFIX=""
 [[ "${DQP_FLAG}" == "1" ]] && DQP_SUFFIX="_dqp"
 OUT_FILE="$RESULTS_DIR/ch_${DATASET}_${MACHINE}${DQP_SUFFIX}_${TS}.json"
 
+echo >&2
 tee "$OUT_FILE" <<JSON
 {
     "system": "$SYSTEM",
@@ -227,21 +236,18 @@ N_QUERIES=${#QUERY_FILES[@]}
 TOTAL_SEC="0"
 N_VALID=0
 
-echo >&2
-echo "============================================================" >&2
-echo "SUMMARY (best of ${TRIES} per query, dataset=${DATASET}, dqp=${DQP_FLAG})" >&2
-echo "============================================================" >&2
 for ((idx = 0; idx < N_QUERIES; idx++)); do
-  qname="$(basename "${QUERY_FILES[$idx]}" .sql)"
   best="${BEST_TIMES[$idx]:-null}"
-  printf "  %-12s best = %s\n" "$qname" "$best" >&2
   if [[ "$best" != "null" ]]; then
     TOTAL_SEC=$(awk -v a="$TOTAL_SEC" -v b="$best" 'BEGIN { printf "%.6f", a + b }')
     N_VALID=$((N_VALID + 1))
   fi
 done
 
-echo "------------------------------------------------------------" >&2
+echo >&2
+echo "============================================================" >&2
+echo "SUMMARY (best of ${TRIES} per query, dataset=${DATASET}, dqp=${DQP_FLAG})" >&2
+echo "============================================================" >&2
 if (( N_VALID == 0 )); then
   echo "Total time:  N/A (no successful queries)" >&2
 else
