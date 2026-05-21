@@ -1,30 +1,44 @@
 #!/usr/bin/env bash
 set -euo pipefail
+
 #
-# Run ClickHouse TPC-H queries 3x each and write a JSON doc with results.
-# - Reads each *.sql file from ./queries (sorted) as one query (multi-statement OK).
-# - Keeps the original timing/grep pipeline intact.
-# - Prints progress to stderr; writes the final JSON to BOTH stdout and
-#   results/ch_<dataset>[_dqp]_<ts>.json (override dir with RESULTS_DIR env).
-#
-# Required env:
-#   DATASET   ClickHouse database to use (e.g. sf10, sf100, sf1000)
+# Run ClickHouse Cloud TPC-H queries 3x each and emit JSON to stdout.
 #
 # Usage:
-#   DATASET=<db> ./run_bench.sh <system> <machine_desc> <cluster_size> <base_comment> <dqp_flag>
+#   ./run.sh --database DB <system> <machine_desc> <cluster_size> <base_comment> <parallel_replicas_flag> [data_size]
+#
 # Example:
-#   DATASET=sf10  ./run_bench.sh "ClickHouse Cloud (AWS)" "236GiB" 3 "1B rows" 0
-#   DATASET=sf100 ./run_bench.sh "ClickHouse Cloud (AWS)" "236GiB" 3 "1B rows" 1   # enable distributed query plan
-# ---------------------------------------------------------------------------
+#   ./run.sh --database sf10 "ClickHouse Cloud (AWS)" "236GiB" 3 "TPC-H SF10" 0 \
+#     > results_sf10/clickhouse_cloud_sf10.json
+#
+# Optional env:
+#   QUERY_DIR=queries
+#   TRIES=3
+#   FQDN=<clickhouse-cloud-host>
+#   PASSWORD=<clickhouse-password>
+#
 
-if [[ $# -lt 5 ]]; then
-  echo "Usage: DATASET=<db> $0 <system> <machine_desc> <cluster_size> <base_comment> <dqp_flag>" >&2
+DATABASE=""
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --database)
+      DATABASE="$2"
+      shift 2
+      ;;
+    *)
+      break
+      ;;
+  esac
+done
+
+if [[ -z "$DATABASE" ]]; then
+  echo "ERROR: --database is required, e.g. --database sf10" >&2
   exit 1
 fi
 
-if [[ -z "${DATASET:-}" ]]; then
-  echo "ERROR: DATASET env var is not set (e.g. DATASET=sf10)." >&2
-  echo "Usage: DATASET=<db> $0 <system> <machine_desc> <cluster_size> <base_comment> <dqp_flag>" >&2
+if [[ $# -lt 5 ]]; then
+  echo "Usage: $0 --database DB <system> <machine_desc> <cluster_size> <base_comment> <parallel_replicas_flag> [data_size]" >&2
   exit 1
 fi
 
@@ -32,221 +46,145 @@ SYSTEM="$1"
 MACHINE="$2"
 CLUSTER_SIZE="$3"
 BASE_COMMENT="$4"
-DQP_FLAG="${5}" # 0 or 1
+PARALLEL_FLAG="$5"
+DATA_SIZE="${6:-0}"
 
-COMMENT="${BASE_COMMENT} (dataset=${DATASET}, Distributed_Query_Plans=${DQP_FLAG})"
+QUERY_DIR="${QUERY_DIR:-queries}"
+TRIES="${TRIES:-3}"
+
+COMMENT="${BASE_COMMENT} (enable_parallel_replicas=${PARALLEL_FLAG})"
 PROPRIETARY="yes"
 TUNED="no"
 TAGS='["C++","column-oriented","ClickHouse derivative","managed","aws"]'
 LOAD_TIME=0
-DATA_SIZE=0
 
-# Client: connection settings come from clickhouse-client.xml (host/user/password/secure).
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-CLIENT_BIN="${CLIENT_BIN:-$HOME/work/clickhouse-dist/clickhouse}"
-CLIENT_CONFIG="${CLIENT_CONFIG:-$SCRIPT_DIR/clickhouse-client.xml}"
+FQDN="${FQDN:=localhost}"
+PASSWORD="${PASSWORD:=}"
 
-SETTINGS_PREFIX=""
-if [[ "${DQP_FLAG}" == "1" ]]; then
-  # Enables distributed query plan.
-  SETTINGS_PREFIX="SET make_distributed_plan=1, enable_parallel_replicas=0, \
-  rewrite_in_to_join=1, correlated_subqueries_use_in_memory_buffer=0, \
-  allow_experimental_correlated_subqueries=1, \
-  enable_join_runtime_filters=0, \
-  query_plan_optimize_join_order_algorithm='dpsize greedy', \
-  allow_statistic_optimize=1, \
-  use_join_disjunctions_push_down=1, \
-  distributed_plan_prefer_replicas_over_workers=1, \
-  distributed_plan_default_shuffle_join_bucket_count=5, \
-  distributed_plan_default_reader_bucket_count=5; "
+CLIENT_BASE=(
+ clickhouse-client
+  --host "$FQDN"
+  --user "$CLICKHOUSE_USER"
+  --database "$DATABASE"
+)
+
+if [[ -n "$PASSWORD" ]]; then
+  CLIENT_BASE+=(--secure --password "$PASSWORD")
 fi
 
-TRIES=3
+EXTRA_SETTINGS=(
+  --enable_parallel_replicas="${PARALLEL_FLAG}"
+  --max_parallel_replicas="${CLUSTER_SIZE}"
+)
 
-# --- Collect *.sql files from ./queries (sorted, multi-statement OK) ---
-QUERIES_DIR="${QUERIES_DIR:-$SCRIPT_DIR/queries}"
-shopt -s nullglob
-QUERY_FILES=("$QUERIES_DIR"/*.sql)
-shopt -u nullglob
-IFS=$'\n' QUERY_FILES=($(printf '%s\n' "${QUERY_FILES[@]}" | sort)); unset IFS
+command -v clickhouse-client >/dev/null 2>&1 || {
+  echo "ERROR: clickhouse-client not found in PATH" >&2
+  exit 1
+}
 
-TOTAL=${#QUERY_FILES[@]}
-echo "Parsed queries: ${TOTAL} (from ${QUERIES_DIR})" >&2
-if (( TOTAL == 0 )); then
-  echo "ERROR: No .sql files found in ${QUERIES_DIR}" >&2
+[[ -d "$QUERY_DIR" ]] || {
+  echo "ERROR: Query directory '${QUERY_DIR}' not found" >&2
+  exit 1
+}
+
+if ! [[ "$CLUSTER_SIZE" =~ ^[0-9]+([.][0-9]+)?$ ]]; then
+  echo "ERROR: cluster_size must be numeric because it is emitted as JSON number. Got: ${CLUSTER_SIZE}" >&2
   exit 1
 fi
 
-# --- Collect results, with error detection ------------------------------
-# For multi-statement files (e.g. query_15.sql with CREATE/SELECT/DROP VIEW),
-# --time prints one decimal per statement; we sum them into a single number.
-# A run is considered FAILED if either:
-#   - clickhouse client exits non-zero, or
-#   - no timing decimal is found in the output (likely a parser/server error).
-# On first failure for a given query we print the full client output to
-# stderr, record `null` for that try AND for any remaining tries (no
-# retries), then move on to the next query so the rest of the suite still
-# completes.
-FAIL_LOG="$(mktemp -t ch_bench_fail.XXXXXX)"
-trap 'rm -f "$FAIL_LOG"' EXIT
+echo "→ Checking ClickHouse connection/database ${DATABASE} ..." >&2
+
+if ! "${CLIENT_BASE[@]}" --query "SELECT 1" >/dev/null; then
+  echo "ERROR: Could not connect to ClickHouse database '${DATABASE}' on host '${FQDN}'." >&2
+  exit 1
+fi
+
+VERSION="$(
+  "${CLIENT_BASE[@]}" \
+    --format=TSV \
+    --query="SELECT version()" 2>/dev/null | tr -d '[:space:]'
+)"
+
+if [[ -z "$VERSION" ]]; then
+  VERSION="unknown"
+fi
+
+QUERY_FILES=()
+for i in $(seq -w 1 22); do
+  q="${QUERY_DIR}/query_${i}.sql"
+  [[ -f "$q" ]] || {
+    echo "ERROR: Missing query file: ${q}" >&2
+    exit 1
+  }
+  QUERY_FILES+=("$q")
+done
+
+echo "→ ClickHouse version: ${VERSION}" >&2
+echo "→ Database: ${DATABASE}" >&2
+echo "→ Query dir: ${QUERY_DIR}" >&2
+echo "→ Queries: ${#QUERY_FILES[@]}" >&2
+echo "→ Machine metadata: ${MACHINE}" >&2
+echo "→ Cluster size metadata: ${CLUSTER_SIZE}" >&2
+echo "→ Parallel replicas flag: ${PARALLEL_FLAG}" >&2
+echo "→ Tries per query: ${TRIES}" >&2
 
 RESULT_RAW="$(
-for f in "${QUERY_FILES[@]}"; do
-    name="$(basename "$f" .sql)"
-    query="$(<"$f")"
-    full_query="${SETTINGS_PREFIX}${query}"
-    echo "Running ${name}..." >&2
-    echo -n "["
-    ARRAY_VALUES=()
-    failed=0
-    for i in $(seq 1 $TRIES); do
-        if (( failed == 1 )); then
-            # Earlier try failed for this query; skip remaining tries.
-            val="null"
-            ARRAY_VALUES+=("$val")
-            echo -n "$val"
-            [[ "$i" != $TRIES ]] && echo -n ", "
-            continue
-        fi
+query_num=1
 
-        tmp_out="$(mktemp -t ch_bench_out.XXXXXX)"
-        set +e
-        "$CLIENT_BIN" client -c "$CLIENT_CONFIG" --database "$DATASET" \
-          --time --format=Null --progress 0 --multiquery \
-          --query="$full_query" >"$tmp_out" 2>&1
-        rc=$?
-        set -e
+for query_file in "${QUERY_FILES[@]}"; do
+  query="$(sed 's/[[:space:]]*$//' "$query_file")"
+  query="$(printf "%s\n" "$query" | sed '$ s/;[[:space:]]*$//')"
 
-        val=$(awk '
-            /^[0-9]+\.[0-9]+$/ { sum += $1; n++ }
-            END { if (n > 0) printf "%.3f", sum; else printf "null" }
-        ' "$tmp_out")
+  echo "→ Running ${query_file} as query #${query_num} ..." >&2
 
-        err_reason=""
-        if (( rc != 0 )); then
-            err_reason="exit=${rc}"
-        elif [[ "$val" == "null" ]]; then
-            err_reason="no-timing"
-        fi
+  echo -n "["
+  arr=()
 
-        if [[ -n "$err_reason" ]]; then
-            val="null"
-            failed=1
-            {
-              echo
-              echo "!!! ${name} run ${i}/${TRIES} FAILED (${err_reason}). Skipping remaining tries. Client output:"
-              sed 's/^/    | /' "$tmp_out"
-              echo
-            } >&2
-            echo "${name} run ${i}/${TRIES} FAILED (${err_reason})" >> "$FAIL_LOG"
-        fi
+  for try in $(seq 1 "$TRIES"); do
+    val="$(
+      (
+        "${CLIENT_BASE[@]}" \
+          --time \
+          --format=Null \
+          --query="$query" \
+          --progress 0 \
+          "${EXTRA_SETTINGS[@]}" 2>&1 \
+          | grep -o -P '^\d+\.\d+$' \
+          || echo -n "null"
+      ) | tr -d '\n'
+    )"
 
-        rm -f "$tmp_out"
+    arr+=("$val")
+    echo -n "$val"
+    [[ "$try" != "$TRIES" ]] && echo -n ", "
+  done
 
-        ARRAY_VALUES+=("$val")
-        echo -n "$val"
-        [[ "$i" != $TRIES ]] && echo -n ", "
-    done
-    echo "],"
-    echo "→ [${ARRAY_VALUES[*]}]" >&2
+  echo "],"
+  echo "   -> [${arr[*]}]" >&2
+
+  query_num=$((query_num + 1))
 done
 )"
 
-if [[ -s "$FAIL_LOG" ]]; then
-    fail_count=$(wc -l < "$FAIL_LOG" | tr -d ' ')
-    echo >&2
-    echo "============================================================" >&2
-    echo "FAILED RUNS: ${fail_count}" >&2
-    sed 's/^/  - /' "$FAIL_LOG" >&2
-    echo "============================================================" >&2
-fi
-
-# Make valid JSON arrays (drop trailing comma)
 RESULT_CLEAN="$(printf "%s\n" "$RESULT_RAW" | sed '$ s/,\s*$//')"
-
 DATE_ISO="$(date -u +%F)"
-TS="$(date -u +%Y%m%dT%H%M%SZ)"
-RESULTS_DIR="${RESULTS_DIR:-$SCRIPT_DIR/results}"
-mkdir -p "$RESULTS_DIR"
-DQP_SUFFIX=""
-[[ "${DQP_FLAG}" == "1" ]] && DQP_SUFFIX="_dqp"
-OUT_FILE="$RESULTS_DIR/ch_${DATASET}_${MACHINE}${DQP_SUFFIX}_${TS}.json"
 
-tee "$OUT_FILE" <<JSON
+cat <<JSON
 {
-    "system": "$SYSTEM",
-    "date": "$DATE_ISO",
-    "machine": "$MACHINE",
-    "cluster_size": $CLUSTER_SIZE,
-    "proprietary": "$PROPRIETARY",
-    "tuned": "$TUNED",
-    "comment": "$COMMENT",
-
-    "tags": $TAGS,
-
-    "load_time": $LOAD_TIME,
-    "data_size": $DATA_SIZE,
-
-    "result": [
+  "system": "$SYSTEM",
+  "version": "$VERSION",
+  "date": "$DATE_ISO",
+  "machine": "$MACHINE",
+  "cluster_size": $CLUSTER_SIZE,
+  "proprietary": "$PROPRIETARY",
+  "tuned": "$TUNED",
+  "comment": "$COMMENT",
+  "tags": $TAGS,
+  "load_time": $LOAD_TIME,
+  "data_size": $DATA_SIZE,
+  "database": "$DATABASE",
+  "result": [
 $RESULT_CLEAN
-    ]
+  ]
 }
 JSON
-
-echo "" >&2
-echo "Wrote results → $OUT_FILE" >&2
-
-# --- Console-only summary: best-of-N per query and total time -----------
-# Best time = min over the TRIES tries (ignoring `null` / failed runs).
-# Total     = sum of per-query best times (queries with all-null tries are
-#             excluded from the sum but still listed).
-# Use a read loop (not `mapfile`) so this works on macOS' default bash 3.2.
-BEST_TIMES=()
-while IFS= read -r _bt_line; do
-  BEST_TIMES+=("$_bt_line")
-done < <(
-  printf '%s\n' "$RESULT_CLEAN" | awk '
-    {
-      line = $0
-      gsub(/[\[\],]/, " ", line)
-      best = -1
-      n = split(line, vals, /[ \t]+/)
-      for (i = 1; i <= n; i++) {
-        v = vals[i]
-        if (v == "" || v == "null") continue
-        x = v + 0
-        if (best < 0 || x < best) best = x
-      }
-      if (best < 0) print "null"
-      else printf "%.3f\n", best
-    }
-  '
-)
-
-N_QUERIES=${#QUERY_FILES[@]}
-TOTAL_SEC="0"
-N_VALID=0
-
-echo >&2
-echo "============================================================" >&2
-echo "SUMMARY (best of ${TRIES} per query, dataset=${DATASET}, dqp=${DQP_FLAG})" >&2
-echo "============================================================" >&2
-for ((idx = 0; idx < N_QUERIES; idx++)); do
-  qname="$(basename "${QUERY_FILES[$idx]}" .sql)"
-  best="${BEST_TIMES[$idx]:-null}"
-  printf "  %-12s best = %s\n" "$qname" "$best" >&2
-  if [[ "$best" != "null" ]]; then
-    TOTAL_SEC=$(awk -v a="$TOTAL_SEC" -v b="$best" 'BEGIN { printf "%.6f", a + b }')
-    N_VALID=$((N_VALID + 1))
-  fi
-done
-
-echo "------------------------------------------------------------" >&2
-if (( N_VALID == 0 )); then
-  echo "Total time:  N/A (no successful queries)" >&2
-else
-  TOTAL_FMT=$(awk -v t="$TOTAL_SEC" 'BEGIN { printf "%.3f", t }')
-  printf "Total time:  %s sec  (sum of best times across %d/%d queries)\n" \
-    "$TOTAL_FMT" "$N_VALID" "$N_QUERIES" >&2
-fi
-echo "============================================================" >&2
