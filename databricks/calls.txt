@@ -5,9 +5,6 @@ source ~/.venvs/dbsql/bin/activate
 
 
 
-mkdir -p results_sf10
-
-
 python run_bench.py \
   --scale sf10 \
   --machine "4X-Large" \
@@ -28,14 +25,46 @@ python summarize_results.py \
 
 
 
+mkdir -p results_sf10
+mkdir -p results_enriched_sf10
+
 
 ./run_full.sh sf10 "4X-Large" 528 results_sf10/databricks_sf10_4xlarge.json
-
-mkdir -p results_enriched_sf10
 ./enrich.sh  results_sf10/databricks_sf10_4xlarge.json \
             pricings/sql_serverless_compute.json \
             results_enriched_sf10/databricks_sf10_4xlarge_enriched.json \
             --cloud aws --region us-east-1 --plan premium
+
+
+
+./run_full.sh sf10 "X-Large" 80 results_sf10/databricks_sf10_xlarge.json
+./enrich.sh  results_sf10/databricks_sf10_xlarge.json \
+            pricings/sql_serverless_compute.json \
+            results_enriched_sf10/databricks_sf10_xlarge_enriched.json \
+            --cloud aws --region us-east-1 --plan premium
+
+
+
+./run_full.sh sf10 "Large" 40 results_sf10/databricks_sf10_large.json
+./enrich.sh  results_sf10/databricks_sf10_large.json \
+            pricings/sql_serverless_compute.json \
+            results_enriched_sf10/databricks_sf10_large_enriched.json \
+            --cloud aws --region us-east-1 --plan premium
+
+
+./run_full.sh sf10 "Medium" 24 results_sf10/databricks_sf10_medium.json
+./enrich.sh  results_sf10/databricks_sf10_medium.json \
+            pricings/sql_serverless_compute.json \
+            results_enriched_sf10/databricks_sf10_medium_enriched.json \
+            --cloud aws --region us-east-1 --plan premium
+
+
+
+
+
+
+
+
 
 
 
@@ -50,6 +79,38 @@ mkdir -p results_enriched_sf100
             pricings/sql_serverless_compute.json \
             results_enriched_sf100/databricks_sf100_4xlarge_enriched.json \
             --cloud aws --region us-east-1 --plan premium
+
+
+./run_full.sh sf100 "X-Large" 80 results_sf100/databricks_sf100_xlarge.json
+./enrich.sh  results_sf100/databricks_sf100_xlarge.json \
+            pricings/sql_serverless_compute.json \
+            results_enriched_sf100/databricks_sf100_xlarge_enriched.json \
+            --cloud aws --region us-east-1 --plan premium
+
+
+
+
+./run_full.sh sf100 "Large" 40 results_sf100/databricks_sf100_large.json
+./enrich.sh  results_sf100/databricks_sf100_large.json \
+            pricings/sql_serverless_compute.json \
+            results_enriched_sf100/databricks_sf100_large_enriched.json \
+            --cloud aws --region us-east-1 --plan premium
+
+./run_full.sh sf100 "Medium" 24 results_sf100/databricks_sf100_medium.json
+./enrich.sh  results_sf100/databricks_sf100_medium.json \
+            pricings/sql_serverless_compute.json \
+            results_enriched_sf100/databricks_sf100_medium_enriched.json \
+            --cloud aws --region us-east-1 --plan premium
+
+
+
+
+
+
+
+
+
+
 
 
 
