@@ -10,6 +10,7 @@ WAREHOUSE=BENCH2COST_MEDIUM ./load_scale.sh sf10
 
 mkdir -p results_sf10
 
+
 WAREHOUSE=BENCH2COST_4XLARGE ./run.sh sf10 TPCH_BENCH "4X-Large" 128 \
   > results_sf10/snowflake_sf10_4xl.json
 
@@ -21,8 +22,6 @@ mkdir -p results_enriched_sf10
 
 
 
-
-
 WAREHOUSE=BENCH2COST_4XLARGE_GEN2 ./run.sh sf10 TPCH_BENCH "Gen2 4X-Large" 172.8 \
   > results_sf10/snowflake_sf10_4xl_gen2.json
 
@@ -30,6 +29,57 @@ WAREHOUSE=BENCH2COST_4XLARGE_GEN2 ./run.sh sf10 TPCH_BENCH "Gen2 4X-Large" 172.8
                pricings/gen2_warehouse.json \
                results_enriched_sf10/snowflake_sf10_4xl_gen2_enriched.json \
                --cloud aws --region us-east-1
+
+
+
+
+
+
+WAREHOUSE=BENCH2COST_LARGE ./run.sh sf10 TPCH_BENCH "Large" 8 \
+  > results_sf10/snowflake_sf10_large.json
+
+./enrich.sh results_sf10/snowflake_sf10_large.json \
+               pricings/standard_warehouse.json \
+               results_enriched_sf10/snowflake_sf10_large_enriched.json \
+               --cloud aws --region us-east-1
+
+
+
+
+WAREHOUSE=BENCH2COST_LARGE_GEN2 ./run.sh sf10 TPCH_BENCH "Gen2 Large" 10.8 \
+  > results_sf10/snowflake_sf10_large_gen2.json
+
+./enrich.sh results_sf10/snowflake_sf10_large_gen2.json \
+               pricings/gen2_warehouse.json \
+               results_enriched_sf10/snowflake_sf10_large_gen2_enriched.json \
+               --cloud aws --region us-east-1
+
+
+
+
+WAREHOUSE=BENCH2COST_MEDIUM ./run.sh sf10 TPCH_BENCH "Medium" 4 \
+  > results_sf10/snowflake_sf10_medium.json
+
+./enrich.sh results_sf10/snowflake_sf10_medium.json \
+               pricings/standard_warehouse.json \
+               results_enriched_sf10/snowflake_sf10_medium_enriched.json \
+               --cloud aws --region us-east-1
+
+
+
+WAREHOUSE=BENCH2COST_MEDIUM_GEN2 ./run.sh sf10 TPCH_BENCH "Gen2 Medium" 5.4 \
+  > results_sf10/snowflake_sf10_medium_gen2.json
+
+./enrich.sh results_sf10/snowflake_sf10_medium_gen2.json \
+               pricings/gen2_warehouse.json \
+               results_enriched_sf10/snowflake_sf10_medium_gen2_enriched.json \
+               --cloud aws --region us-east-1
+
+
+
+
+
+
 
 
 
@@ -63,6 +113,50 @@ WAREHOUSE=BENCH2COST_4XLARGE_GEN2 ./run.sh sf100 TPCH_BENCH "Gen2 4X-Large" 172.
                pricings/gen2_warehouse.json \
                results_enriched_sf100/snowflake_sf100_4xl_gen2_enriched.json \
                --cloud aws --region us-east-1
+
+
+
+
+WAREHOUSE=BENCH2COST_LARGE ./run.sh sf100 TPCH_BENCH "Large" 8 \
+  > results_sf100/snowflake_sf100_large.json
+
+./enrich.sh results_sf100/snowflake_sf100_large.json \
+               pricings/standard_warehouse.json \
+               results_enriched_sf100/snowflake_sf100_large_enriched.json \
+               --cloud aws --region us-east-1
+
+
+
+
+WAREHOUSE=BENCH2COST_LARGE_GEN2 ./run.sh sf100 TPCH_BENCH "Gen2 Large" 10.8 \
+  > results_sf100/snowflake_sf100_large_gen2.json
+
+./enrich.sh results_sf100/snowflake_sf100_large_gen2.json \
+               pricings/gen2_warehouse.json \
+               results_enriched_sf100/snowflake_sf100_large_gen2_enriched.json \
+               --cloud aws --region us-east-1
+
+
+
+
+
+WAREHOUSE=BENCH2COST_MEDIUM ./run.sh sf100 TPCH_BENCH "Medium" 4 \
+  > results_sf100/snowflake_sf100_medium.json
+
+./enrich.sh results_sf100/snowflake_sf100_medium.json \
+               pricings/standard_warehouse.json \
+               results_enriched_sf100/snowflake_sf100_medium_enriched.json \
+               --cloud aws --region us-east-1
+
+
+WAREHOUSE=BENCH2COST_MEDIUM_GEN2 ./run.sh sf100 TPCH_BENCH "Gen2 Medium" 5.4 \
+  > results_sf100/snowflake_sf100_medium_gen2.json
+
+./enrich.sh results_sf100/snowflake_sf100_medium_gen2.json \
+               pricings/gen2_warehouse.json \
+               results_enriched_sf100/snowflake_sf100_medium_gen2_enriched.json \
+               --cloud aws --region us-east-1
+
 
 
 

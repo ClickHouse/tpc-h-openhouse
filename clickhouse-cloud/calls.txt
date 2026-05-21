@@ -1,0 +1,55 @@
+
+
+
+
+
+mkdir -p results_sf10
+
+./run_bench.sh --database sf10 "ClickHouse Cloud (AWS)" "236GiB" 1 "TPC-H SF10" 0 \
+> results_sf10/aws.1.236_run_01_sf10.json
+
+
+mkdir -p results_enriched_sf10
+
+./enrich.sh \
+  results_sf10 \
+  results_enriched_sf10
+
+
+
+
+
+
+mkdir -p results_sf100
+
+./run_bench.sh --database sf100 "ClickHouse Cloud (AWS)" "236GiB" 1 "TPC-H SF100" 0 \
+> results_sf100/aws.1.236_run_01_sf100.json
+
+./run_bench.sh --database sf100 "ClickHouse Cloud (AWS)" "236GiB" 3 "TPC-H SF100" 1 \
+> results_sf100/aws.3.236_run_01_sf100.json
+
+
+mkdir -p results_enriched_sf100
+
+./enrich.sh \
+  results_sf100 \
+  results_enriched_sf100
+
+
+
+
+mkdir -p results_sf1000
+
+./run_bench.sh --database sf1000 "ClickHouse Cloud (AWS)" "236GiB" 1 "TPC-H SF1000" 0 \
+> results_sf1000/aws.1.236_run_01_sf1000.json
+
+
+./run_bench.sh --database sf1000 "ClickHouse Cloud (AWS)" "236GiB" 3 "TPC-H SF1000" 1 \
+> results_sf1000/aws.3.236_run_01_sf1000.json
+
+
+mkdir -p results_enriched_sf1000
+
+./enrich.sh \
+  results_sf1000 \
+  results_enriched_sf1000

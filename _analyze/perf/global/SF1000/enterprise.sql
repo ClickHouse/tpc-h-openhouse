@@ -3,6 +3,21 @@ sel AS
 (
 
 
+    --     -- 01: ClickHouse Enterprise (toggle which CH variant you want by uncommenting)
+    SELECT '01' AS id, 'ClickHouse Ent (1×236GiB)' AS bar_label, 'ClickHouse%' AS system_pat,
+           'Enterprise' AS tier, 'default' AS compute_model,
+           'aws' AS provider, 'us-east-1' AS region, '236GiB' AS machine, '1' AS cluster_size
+
+        UNION ALL
+
+    --     -- 01: ClickHouse Enterprise (toggle which CH variant you want by uncommenting)
+    SELECT '01' AS id, 'ClickHouse Ent (3×236GiB)' AS bar_label, 'ClickHouse%' AS system_pat,
+           'Enterprise' AS tier, 'default' AS compute_model,
+           'aws' AS provider, 'us-east-1' AS region, '236GiB' AS machine, '3' AS cluster_size
+
+        UNION ALL
+
+
     -- 02: BigQuery Enterprise  (Capacity)
     SELECT '02' AS id, 'BigQuery Ent' AS bar_label, 'Bigquery' AS system_pat,
            'Enterprise' AS tier, 'capacity' AS compute_model,
@@ -14,12 +29,13 @@ sel AS
            'OnDemand' AS tier, 'on_demand' AS compute_model,
            'gcp' AS provider, 'us-east-1' AS region, 'serverless' AS machine, 'serverless' AS cluster_size
 
+
     UNION ALL
     -- 04: Redshift Serverless (AWS)
     SELECT '04' AS id, 'Redshift Serverless' AS bar_label, 'Redshift%' AS system_pat,
            'Standard' AS tier, 'capacity' AS compute_model,
            'aws' AS provider, 'us-east-1' AS region, 'serverless' AS machine, 'serverless' AS cluster_size
-    UNION ALL
+        UNION ALL
     -- 08: Snowflake Enterprise 4X-Large (128 credits/h)
     SELECT '19' AS id, 'Snowflake Ent (4X-L)' AS bar_label, 'Snowflake%' AS system_pat,
            'enterprise' AS tier, NULL AS compute_model,
@@ -34,7 +50,7 @@ sel AS
            'aws' AS provider, 'us-east-1' AS region,
            'Gen2 4X-Large' AS machine, '172.8' AS cluster_size
 
-            UNION ALL
+                UNION ALL
     -- 07: Databricks SQL Serverless (4X-Large)
     SELECT '21' AS id, 'Databricks Ent (4X-Large)' AS bar_label, 'Databricks%' AS system_pat,
         'premium' AS tier, NULL AS compute_model, 'aws' AS provider, 'us-east-1' AS region, 'serverless' AS machine, '4X-Large' AS cluster_size
@@ -71,7 +87,7 @@ rows AS (
       SELECT
           system, tier, compute_model, provider, region, machine, cluster_size,
           data_size, storage_cost, compute_costs, result
-      FROM bench2cost_tcph_sf100.costs
+      FROM bench2cost_tcph_sf1000.costs
   ) c
             ON  lowerUTF8(c.system) LIKE lowerUTF8(s.system_pat)
             AND ifNull(c.tier, '') = s.tier

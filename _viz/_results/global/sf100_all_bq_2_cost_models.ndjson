@@ -1,0 +1,10 @@
+{"id":"01","system":"ClickHouse","tier":"Enterprise","compute_model":null,"bar_label":"ClickHouse 1 x 59 Cores","rt_hot":19.806,"cost_hot":0.06335}
+{"id":"02","system":"Snowflake","tier":"enterprise","compute_model":null,"bar_label":"Snowflake Medium","rt_hot":22.903,"cost_hot":0.10306}
+{"id":"03","system":"Snowflake","tier":"enterprise","compute_model":null,"bar_label":"Snowflake Large","rt_hot":15.908,"cost_hot":0.14317}
+{"id":"04","system":"Snowflake","tier":"enterprise","compute_model":null,"bar_label":"Snowflake 4X-L","rt_hot":14.729,"cost_hot":2.12098}
+{"id":"05","system":"Databricks","tier":"premium","compute_model":null,"bar_label":"Databricks Medium","rt_hot":39.984,"cost_hot":0.18659}
+{"id":"06","system":"Databricks","tier":"premium","compute_model":null,"bar_label":"Databricks Large","rt_hot":28.855,"cost_hot":0.22443}
+{"id":"07","system":"Databricks","tier":"premium","compute_model":null,"bar_label":"Databricks 4X-Large","rt_hot":26.434,"cost_hot":2.71389}
+{"id":"08","system":"BigQuery","tier":"Enterprise","compute_model":"capacity","bar_label":"BigQuery 2000 slots","rt_hot":26.169,"cost_hot":0.16329}
+{"id":"09","system":"BigQuery","tier":"OnDemand","compute_model":"on_demand","bar_label":"BigQuery On-demand","rt_hot":26.169,"cost_hot":3.21432}
+{"id":"10","system":"Redshift","tier":"Standard","compute_model":"capacity","bar_label":"Redshift Serverless 128 RPU","rt_hot":30.665,"cost_hot":0.43589}

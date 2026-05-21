@@ -1,0 +1,106 @@
+
+python3 -m venv ~/.venvs/bench-viz
+source ~/.venvs/bench-viz/bin/activate
+pip install --upgrade pip
+pip install matplotlib numpy pandas
+pip install adjustText
+
+
+
+
+python plot_aggregate_runtime.py \
+  --no-title \
+  --no-legend \
+  --no-y-axes \
+  --no-grid \
+      --no-footer \
+  --no-border \
+  --show-values \
+    --cost-line \
+  --show-cost-values \
+  --out ./_out/aggregate_runtime_sf10_cost_overlay.png \
+  < ./_results/global/sf10_all.ndjson
+
+
+
+
+python plot_aggregate_runtime.py \
+  --no-title \
+  --no-legend \
+  --no-y-axes \
+  --no-grid \
+    --no-footer \
+  --no-border \
+  --show-values \
+  --out ./_out/aggregate_runtime_sf100.png \
+  < ./_results/global/sf100_all.ndjson
+
+
+python plot_aggregate_runtime.py \
+  --no-title \
+  --no-legend \
+  --no-y-axes \
+  --no-grid \
+      --no-footer \
+  --no-border \
+  --show-values \
+    --cost-line \
+  --show-cost-values \
+  --out ./_out/aggregate_runtime_sf100_cost_overlay.png \
+  < ./_results/global/sf100_all.ndjson
+
+
+
+
+
+python plot_tpch_query_bars.py \
+  --input _results/per_query/sf10_all.ndjson \
+  --output _out/sf10_all_hot_runtimes_linear.png \
+  --cols 3 \
+  --title "TPC-H SF10 hot query runtimes"
+
+
+python plot_tpch_query_bars.py \
+  --input _results/per_query/sf100_all.ndjson \
+  --output _out/sf100_all_hot_runtimes_linear.png \
+  --cols 3 \
+  --title "TPC-H SF100 hot query runtimes"
+
+
+-------------------------
+-- skip
+-------------------------
+python plot_tpch_grouped.py \
+  --input _results/per_query/sf100_closest_hw.ndjson \
+  --output _out/sf100_closest_hw_grouped_linear.png \
+  --title "TPC-H SF100 hot query runtimes"
+
+
+
+-------------------------
+-- skip
+-------------------------
+python render2.py \
+    --no-title \
+   --with-axes \
+  --marker-size 200 \
+  --xticks "15, 18, 20, 25, 30, 35, 40" \
+  --yticks "0.05, 0.1, 0.15, 0.2, 0.3, 0.5, 1, 2, 3.5" \
+  --xlim "14, 42" \
+    --out ./_out/quadrants_sf100.png < ./_results/global/sf100_all_bq_2_cost_models.ndjson
+
+
+
+
+
+python cost_per_dollar.py --no-title \
+  --out ./_out/factor_sf10.png \
+  < ./_results/global/sf10_all_bq_2_cost_models.ndjson
+
+
+python cost_per_dollar.py --no-title \
+  --out ./_out/factor_sf100.png \
+  < ./_results/global/sf100_all_bq_2_cost_models.ndjson
+
+
+
