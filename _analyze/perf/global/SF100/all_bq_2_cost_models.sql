@@ -1,0 +1,148 @@
+WITH
+sel AS
+(
+
+
+   SELECT '01' AS id, 'ClickHouse 1 x 59 Cores' AS bar_label, 'ClickHouse%' AS system_pat,
+           'Enterprise' AS tier, 'default' AS compute_model,
+           'aws' AS provider, 'us-east-1' AS region, '236GiB' AS machine, '1' AS cluster_size
+
+
+    UNION ALL
+    SELECT '02' AS id, 'Snowflake Medium' AS bar_label, 'Snowflake%' AS system_pat,
+           'enterprise' AS tier, NULL AS compute_model,
+           'aws' AS provider, 'us-east-1' AS region, 'Gen2 Medium' AS machine, '5.4' AS cluster_size
+
+    UNION ALL
+    SELECT '03' AS id, 'Snowflake Large' AS bar_label, 'Snowflake%' AS system_pat,
+           'enterprise' AS tier, NULL AS compute_model,
+           'aws' AS provider, 'us-east-1' AS region, 'Gen2 Large' AS machine, '10.8' AS cluster_size
+
+    UNION ALL
+    SELECT '04' AS id, 'Snowflake 4X-L' AS bar_label, 'Snowflake%' AS system_pat,
+           'enterprise' AS tier, NULL AS compute_model,
+           'aws' AS provider, 'us-east-1' AS region, 'Gen2 4X-Large' AS machine, '172.8' AS cluster_size
+
+        UNION ALL
+    SELECT '05' AS id, 'Databricks Medium' AS bar_label, 'Databricks%' AS system_pat,
+           'premium' AS tier, NULL AS compute_model,
+           'aws' AS provider, 'us-east-1' AS region, 'serverless' AS machine, 'Medium' AS cluster_size
+
+    UNION ALL
+        SELECT '06' AS id, 'Databricks Large' AS bar_label, 'Databricks%' AS system_pat,
+           'premium' AS tier, NULL AS compute_model,
+           'aws' AS provider, 'us-east-1' AS region, 'serverless' AS machine, 'Large' AS cluster_size
+
+
+--  UNION ALL
+--     SELECT '09' AS id, 'Databricks X-Large' AS bar_label, 'Databricks%' AS system_pat,
+--         'premium' AS tier, NULL AS compute_model, 'aws' AS provider, 'us-east-1' AS region, 'serverless' AS machine, 'X-Large' AS cluster_size
+
+    UNION ALL
+    SELECT '07' AS id, 'Databricks 4X-Large' AS bar_label, 'Databricks%' AS system_pat,
+           'premium' AS tier, NULL AS compute_model,
+           'aws' AS provider, 'us-east-1' AS region, 'serverless' AS machine, '4X-Large' AS cluster_size
+
+    UNION ALL
+    SELECT '08' AS id, 'BigQuery 2000 slots' AS bar_label, 'Bigquery' AS system_pat,
+           'Enterprise' AS tier, 'capacity' AS compute_model,
+           'gcp' AS provider, 'us-east-1' AS region, 'serverless' AS machine, 'serverless' AS cluster_size
+
+       UNION ALL
+    SELECT '09' AS id, 'BigQuery On-demand' AS bar_label, 'Bigquery' AS system_pat,
+           'OnDemand' AS tier, 'on_demand' AS compute_model,
+           'gcp' AS provider, 'us-east-1' AS region, 'serverless' AS machine, 'serverless' AS cluster_size
+    UNION ALL
+    SELECT '10' AS id, 'Redshift Serverless 128 RPU' AS bar_label, 'Redshift%' AS system_pat,
+           'Standard' AS tier, 'capacity' AS compute_model,
+           'aws' AS provider, 'us-east-1' AS region, 'serverless' AS machine, 'serverless' AS cluster_size
+
+
+),
+
+
+rows AS (
+  SELECT
+      s.id,
+      s.bar_label,
+      -- keep raw system for ON; normalize after
+      replaceRegexpOne(
+                replaceRegexpOne(
+                    replaceRegexpOne(c.system, '^Redshift.*$', 'Redshift'),
+                    '^ClickHouse.*$', 'ClickHouse'
+                ),
+                '^Databricks.*$', 'Databricks'
+      ) AS sys,
+      c.tier        AS tier,
+      c.compute_model AS cmodel,
+      c.provider    AS prov,
+      c.region      AS reg,
+      c.machine     AS mach,
+      c.cluster_size AS csize,
+      c.data_size   AS data_sz,
+      c.storage_cost AS stor_cost,
+      c.compute_costs AS comp_arr,
+      c.result        AS res_arr
+  FROM sel s
+  INNER JOIN
+  (
+      -- ensure columns referenced in ON exist on the right side
+      SELECT
+          system, tier, compute_model, provider, region, machine, cluster_size,
+          data_size, storage_cost, compute_costs, result
+      FROM bench2cost_tcph_sf100.costs
+  ) c
+            ON  lowerUTF8(c.system) LIKE lowerUTF8(s.system_pat)
+            AND ifNull(c.tier, '') = s.tier
+            -- normalize compute_model on both sides: NULL == 'default'
+            AND ifNull(c.compute_model, 'default') = ifNull(s.compute_model, 'default')
+            AND lowerUTF8(ifNull(c.provider, '')) = lowerUTF8(s.provider)
+            AND replaceAll(lowerUTF8(ifNull(c.region, '')), '-', '') =
+                replaceAll(lowerUTF8(s.region), '-', '')
+            AND c.machine LIKE concat('%', s.machine)
+            -- critical fix: treat literal 'null' as NULL, then normalize
+            AND ifNull(nullIf(c.cluster_size, 'null'), 'serverless')
+                = ifNull(s.cluster_size, 'serverless')
+),
+
+per_idx AS
+(
+    SELECT
+        id, bar_label, sys, tier, cmodel, prov, reg, mach, csize, data_sz, stor_cost,
+        idx, tup,
+        (isNull(tup.1) AND isNull(tup.2) AND isNull(tup.3)) AS all_null,
+        arrayMin(arrayFilter(x -> isNotNull(x), [tup.1, tup.2, tup.3])) AS hot_cost,
+        arrayElement(res_arr, idx) AS rt,
+        arrayMin(arrayFilter(x -> isNotNull(x), [rt.1, rt.2, rt.3])) AS hot_rt
+    FROM rows
+    ARRAY JOIN arrayEnumerate(comp_arr) AS idx, comp_arr AS tup
+),
+
+mask AS
+(
+    SELECT idx, min(toUInt8(NOT all_null)) AS keep_idx
+    FROM per_idx GROUP BY idx
+)
+
+SELECT
+    id,
+    sys AS system,
+    tier,
+    cmodel AS compute_model,
+    bar_label,   -- for chart labeling
+--     prov AS provider,
+--     reg AS region,
+--     mach AS machine,
+--     csize AS cluster,
+--     formatReadableSize(any(data_sz)) AS data_sz,
+--     round(any(stor_cost), 5) AS cost_data,
+    round(sumIf(hot_rt,   keep_idx=1 AND isNotNull(hot_rt)),   3) AS rt_hot,
+    round(sumIf(hot_cost, keep_idx=1 AND isNotNull(hot_cost)), 5) AS cost_hot
+--        ,
+--     sumIf(1, keep_idx=1) AS nq
+FROM per_idx
+INNER JOIN mask USING (idx)
+GROUP BY id, sys, tier, cmodel, bar_label, prov, reg, mach, csize
+ORDER BY id
+FORMAT JSONEachRow
+;

@@ -1,0 +1,198 @@
+{"id":"01","system":"ClickHouse","tier":"Enterprise","compute_model":null,"bar_label":"ClickHouse 1 x 59 Cores","query_id":1,"query_label":"Q01","rt_hot":0.944}
+{"id":"02","system":"Snowflake","tier":"enterprise","compute_model":null,"bar_label":"Snowflake Medium","query_id":1,"query_label":"Q01","rt_hot":1.282}
+{"id":"03","system":"Snowflake","tier":"enterprise","compute_model":null,"bar_label":"Snowflake Large","query_id":1,"query_label":"Q01","rt_hot":0.778}
+{"id":"04","system":"Snowflake","tier":"enterprise","compute_model":null,"bar_label":"Snowflake 4X-L","query_id":1,"query_label":"Q01","rt_hot":0.817}
+{"id":"05","system":"Databricks","tier":"premium","compute_model":null,"bar_label":"Databricks Medium","query_id":1,"query_label":"Q01","rt_hot":9.819}
+{"id":"06","system":"Databricks","tier":"premium","compute_model":null,"bar_label":"Databricks Large","query_id":1,"query_label":"Q01","rt_hot":1.381}
+{"id":"07","system":"Databricks","tier":"premium","compute_model":null,"bar_label":"Databricks 4X-Large","query_id":1,"query_label":"Q01","rt_hot":0.625}
+{"id":"08","system":"BigQuery","tier":"Enterprise","compute_model":"capacity","bar_label":"BigQuery 2000 slots","query_id":1,"query_label":"Q01","rt_hot":0.305}
+{"id":"09","system":"Redshift","tier":"Standard","compute_model":"capacity","bar_label":"Redshift Serverless 128 RPU","query_id":1,"query_label":"Q01","rt_hot":2.726}
+{"id":"01","system":"ClickHouse","tier":"Enterprise","compute_model":null,"bar_label":"ClickHouse 1 x 59 Cores","query_id":2,"query_label":"Q02","rt_hot":0.32}
+{"id":"02","system":"Snowflake","tier":"enterprise","compute_model":null,"bar_label":"Snowflake Medium","query_id":2,"query_label":"Q02","rt_hot":0.18}
+{"id":"03","system":"Snowflake","tier":"enterprise","compute_model":null,"bar_label":"Snowflake Large","query_id":2,"query_label":"Q02","rt_hot":0.184}
+{"id":"04","system":"Snowflake","tier":"enterprise","compute_model":null,"bar_label":"Snowflake 4X-L","query_id":2,"query_label":"Q02","rt_hot":0.322}
+{"id":"05","system":"Databricks","tier":"premium","compute_model":null,"bar_label":"Databricks Medium","query_id":2,"query_label":"Q02","rt_hot":0.663}
+{"id":"06","system":"Databricks","tier":"premium","compute_model":null,"bar_label":"Databricks Large","query_id":2,"query_label":"Q02","rt_hot":0.688}
+{"id":"07","system":"Databricks","tier":"premium","compute_model":null,"bar_label":"Databricks 4X-Large","query_id":2,"query_label":"Q02","rt_hot":0.587}
+{"id":"08","system":"BigQuery","tier":"Enterprise","compute_model":"capacity","bar_label":"BigQuery 2000 slots","query_id":2,"query_label":"Q02","rt_hot":1.39}
+{"id":"09","system":"Redshift","tier":"Standard","compute_model":"capacity","bar_label":"Redshift Serverless 128 RPU","query_id":2,"query_label":"Q02","rt_hot":0.506}
+{"id":"01","system":"ClickHouse","tier":"Enterprise","compute_model":null,"bar_label":"ClickHouse 1 x 59 Cores","query_id":3,"query_label":"Q03","rt_hot":0.851}
+{"id":"02","system":"Snowflake","tier":"enterprise","compute_model":null,"bar_label":"Snowflake Medium","query_id":3,"query_label":"Q03","rt_hot":0.179}
+{"id":"03","system":"Snowflake","tier":"enterprise","compute_model":null,"bar_label":"Snowflake Large","query_id":3,"query_label":"Q03","rt_hot":0.174}
+{"id":"04","system":"Snowflake","tier":"enterprise","compute_model":null,"bar_label":"Snowflake 4X-L","query_id":3,"query_label":"Q03","rt_hot":0.328}
+{"id":"05","system":"Databricks","tier":"premium","compute_model":null,"bar_label":"Databricks Medium","query_id":3,"query_label":"Q03","rt_hot":0.421}
+{"id":"06","system":"Databricks","tier":"premium","compute_model":null,"bar_label":"Databricks Large","query_id":3,"query_label":"Q03","rt_hot":0.441}
+{"id":"07","system":"Databricks","tier":"premium","compute_model":null,"bar_label":"Databricks 4X-Large","query_id":3,"query_label":"Q03","rt_hot":0.447}
+{"id":"08","system":"BigQuery","tier":"Enterprise","compute_model":"capacity","bar_label":"BigQuery 2000 slots","query_id":3,"query_label":"Q03","rt_hot":1.424}
+{"id":"09","system":"Redshift","tier":"Standard","compute_model":"capacity","bar_label":"Redshift Serverless 128 RPU","query_id":3,"query_label":"Q03","rt_hot":1.947}
+{"id":"01","system":"ClickHouse","tier":"Enterprise","compute_model":null,"bar_label":"ClickHouse 1 x 59 Cores","query_id":4,"query_label":"Q04","rt_hot":0.637}
+{"id":"02","system":"Snowflake","tier":"enterprise","compute_model":null,"bar_label":"Snowflake Medium","query_id":4,"query_label":"Q04","rt_hot":1.683}
+{"id":"03","system":"Snowflake","tier":"enterprise","compute_model":null,"bar_label":"Snowflake Large","query_id":4,"query_label":"Q04","rt_hot":0.694}
+{"id":"04","system":"Snowflake","tier":"enterprise","compute_model":null,"bar_label":"Snowflake 4X-L","query_id":4,"query_label":"Q04","rt_hot":0.912}
+{"id":"05","system":"Databricks","tier":"premium","compute_model":null,"bar_label":"Databricks Medium","query_id":4,"query_label":"Q04","rt_hot":1.586}
+{"id":"06","system":"Databricks","tier":"premium","compute_model":null,"bar_label":"Databricks Large","query_id":4,"query_label":"Q04","rt_hot":1.511}
+{"id":"07","system":"Databricks","tier":"premium","compute_model":null,"bar_label":"Databricks 4X-Large","query_id":4,"query_label":"Q04","rt_hot":1.801}
+{"id":"08","system":"BigQuery","tier":"Enterprise","compute_model":"capacity","bar_label":"BigQuery 2000 slots","query_id":4,"query_label":"Q04","rt_hot":1.232}
+{"id":"09","system":"Redshift","tier":"Standard","compute_model":"capacity","bar_label":"Redshift Serverless 128 RPU","query_id":4,"query_label":"Q04","rt_hot":0.806}
+{"id":"01","system":"ClickHouse","tier":"Enterprise","compute_model":null,"bar_label":"ClickHouse 1 x 59 Cores","query_id":5,"query_label":"Q05","rt_hot":0.917}
+{"id":"02","system":"Snowflake","tier":"enterprise","compute_model":null,"bar_label":"Snowflake Medium","query_id":5,"query_label":"Q05","rt_hot":0.183}
+{"id":"03","system":"Snowflake","tier":"enterprise","compute_model":null,"bar_label":"Snowflake Large","query_id":5,"query_label":"Q05","rt_hot":0.184}
+{"id":"04","system":"Snowflake","tier":"enterprise","compute_model":null,"bar_label":"Snowflake 4X-L","query_id":5,"query_label":"Q05","rt_hot":0.301}
+{"id":"05","system":"Databricks","tier":"premium","compute_model":null,"bar_label":"Databricks Medium","query_id":5,"query_label":"Q05","rt_hot":0.488}
+{"id":"06","system":"Databricks","tier":"premium","compute_model":null,"bar_label":"Databricks Large","query_id":5,"query_label":"Q05","rt_hot":0.553}
+{"id":"07","system":"Databricks","tier":"premium","compute_model":null,"bar_label":"Databricks 4X-Large","query_id":5,"query_label":"Q05","rt_hot":0.527}
+{"id":"08","system":"BigQuery","tier":"Enterprise","compute_model":"capacity","bar_label":"BigQuery 2000 slots","query_id":5,"query_label":"Q05","rt_hot":1.684}
+{"id":"09","system":"Redshift","tier":"Standard","compute_model":"capacity","bar_label":"Redshift Serverless 128 RPU","query_id":5,"query_label":"Q05","rt_hot":1.561}
+{"id":"01","system":"ClickHouse","tier":"Enterprise","compute_model":null,"bar_label":"ClickHouse 1 x 59 Cores","query_id":6,"query_label":"Q06","rt_hot":0.524}
+{"id":"02","system":"Snowflake","tier":"enterprise","compute_model":null,"bar_label":"Snowflake Medium","query_id":6,"query_label":"Q06","rt_hot":0.613}
+{"id":"03","system":"Snowflake","tier":"enterprise","compute_model":null,"bar_label":"Snowflake Large","query_id":6,"query_label":"Q06","rt_hot":0.475}
+{"id":"04","system":"Snowflake","tier":"enterprise","compute_model":null,"bar_label":"Snowflake 4X-L","query_id":6,"query_label":"Q06","rt_hot":0.606}
+{"id":"05","system":"Databricks","tier":"premium","compute_model":null,"bar_label":"Databricks Medium","query_id":6,"query_label":"Q06","rt_hot":0.809}
+{"id":"06","system":"Databricks","tier":"premium","compute_model":null,"bar_label":"Databricks Large","query_id":6,"query_label":"Q06","rt_hot":0.678}
+{"id":"07","system":"Databricks","tier":"premium","compute_model":null,"bar_label":"Databricks 4X-Large","query_id":6,"query_label":"Q06","rt_hot":0.466}
+{"id":"08","system":"BigQuery","tier":"Enterprise","compute_model":"capacity","bar_label":"BigQuery 2000 slots","query_id":6,"query_label":"Q06","rt_hot":0.157}
+{"id":"09","system":"Redshift","tier":"Standard","compute_model":"capacity","bar_label":"Redshift Serverless 128 RPU","query_id":6,"query_label":"Q06","rt_hot":0.151}
+{"id":"01","system":"ClickHouse","tier":"Enterprise","compute_model":null,"bar_label":"ClickHouse 1 x 59 Cores","query_id":7,"query_label":"Q07","rt_hot":0.889}
+{"id":"02","system":"Snowflake","tier":"enterprise","compute_model":null,"bar_label":"Snowflake Medium","query_id":7,"query_label":"Q07","rt_hot":0.195}
+{"id":"03","system":"Snowflake","tier":"enterprise","compute_model":null,"bar_label":"Snowflake Large","query_id":7,"query_label":"Q07","rt_hot":0.227}
+{"id":"04","system":"Snowflake","tier":"enterprise","compute_model":null,"bar_label":"Snowflake 4X-L","query_id":7,"query_label":"Q07","rt_hot":0.284}
+{"id":"05","system":"Databricks","tier":"premium","compute_model":null,"bar_label":"Databricks Medium","query_id":7,"query_label":"Q07","rt_hot":0.46}
+{"id":"06","system":"Databricks","tier":"premium","compute_model":null,"bar_label":"Databricks Large","query_id":7,"query_label":"Q07","rt_hot":0.479}
+{"id":"07","system":"Databricks","tier":"premium","compute_model":null,"bar_label":"Databricks 4X-Large","query_id":7,"query_label":"Q07","rt_hot":0.477}
+{"id":"08","system":"BigQuery","tier":"Enterprise","compute_model":"capacity","bar_label":"BigQuery 2000 slots","query_id":7,"query_label":"Q07","rt_hot":0.798}
+{"id":"09","system":"Redshift","tier":"Standard","compute_model":"capacity","bar_label":"Redshift Serverless 128 RPU","query_id":7,"query_label":"Q07","rt_hot":0.812}
+{"id":"01","system":"ClickHouse","tier":"Enterprise","compute_model":null,"bar_label":"ClickHouse 1 x 59 Cores","query_id":8,"query_label":"Q08","rt_hot":0.983}
+{"id":"02","system":"Snowflake","tier":"enterprise","compute_model":null,"bar_label":"Snowflake Medium","query_id":8,"query_label":"Q08","rt_hot":0.198}
+{"id":"03","system":"Snowflake","tier":"enterprise","compute_model":null,"bar_label":"Snowflake Large","query_id":8,"query_label":"Q08","rt_hot":0.206}
+{"id":"04","system":"Snowflake","tier":"enterprise","compute_model":null,"bar_label":"Snowflake 4X-L","query_id":8,"query_label":"Q08","rt_hot":0.342}
+{"id":"05","system":"Databricks","tier":"premium","compute_model":null,"bar_label":"Databricks Medium","query_id":8,"query_label":"Q08","rt_hot":0.579}
+{"id":"06","system":"Databricks","tier":"premium","compute_model":null,"bar_label":"Databricks Large","query_id":8,"query_label":"Q08","rt_hot":0.602}
+{"id":"07","system":"Databricks","tier":"premium","compute_model":null,"bar_label":"Databricks 4X-Large","query_id":8,"query_label":"Q08","rt_hot":0.568}
+{"id":"08","system":"BigQuery","tier":"Enterprise","compute_model":"capacity","bar_label":"BigQuery 2000 slots","query_id":8,"query_label":"Q08","rt_hot":1.844}
+{"id":"09","system":"Redshift","tier":"Standard","compute_model":"capacity","bar_label":"Redshift Serverless 128 RPU","query_id":8,"query_label":"Q08","rt_hot":0.854}
+{"id":"01","system":"ClickHouse","tier":"Enterprise","compute_model":null,"bar_label":"ClickHouse 1 x 59 Cores","query_id":9,"query_label":"Q09","rt_hot":2.241}
+{"id":"02","system":"Snowflake","tier":"enterprise","compute_model":null,"bar_label":"Snowflake Medium","query_id":9,"query_label":"Q09","rt_hot":3.118}
+{"id":"03","system":"Snowflake","tier":"enterprise","compute_model":null,"bar_label":"Snowflake Large","query_id":9,"query_label":"Q09","rt_hot":2.25}
+{"id":"04","system":"Snowflake","tier":"enterprise","compute_model":null,"bar_label":"Snowflake 4X-L","query_id":9,"query_label":"Q09","rt_hot":1.903}
+{"id":"05","system":"Databricks","tier":"premium","compute_model":null,"bar_label":"Databricks Medium","query_id":9,"query_label":"Q09","rt_hot":5.367}
+{"id":"06","system":"Databricks","tier":"premium","compute_model":null,"bar_label":"Databricks Large","query_id":9,"query_label":"Q09","rt_hot":4.262}
+{"id":"07","system":"Databricks","tier":"premium","compute_model":null,"bar_label":"Databricks 4X-Large","query_id":9,"query_label":"Q09","rt_hot":3.651}
+{"id":"08","system":"BigQuery","tier":"Enterprise","compute_model":"capacity","bar_label":"BigQuery 2000 slots","query_id":9,"query_label":"Q09","rt_hot":2.283}
+{"id":"09","system":"Redshift","tier":"Standard","compute_model":"capacity","bar_label":"Redshift Serverless 128 RPU","query_id":9,"query_label":"Q09","rt_hot":1.332}
+{"id":"01","system":"ClickHouse","tier":"Enterprise","compute_model":null,"bar_label":"ClickHouse 1 x 59 Cores","query_id":10,"query_label":"Q10","rt_hot":1.185}
+{"id":"02","system":"Snowflake","tier":"enterprise","compute_model":null,"bar_label":"Snowflake Medium","query_id":10,"query_label":"Q10","rt_hot":0.186}
+{"id":"03","system":"Snowflake","tier":"enterprise","compute_model":null,"bar_label":"Snowflake Large","query_id":10,"query_label":"Q10","rt_hot":0.23}
+{"id":"04","system":"Snowflake","tier":"enterprise","compute_model":null,"bar_label":"Snowflake 4X-L","query_id":10,"query_label":"Q10","rt_hot":0.21}
+{"id":"05","system":"Databricks","tier":"premium","compute_model":null,"bar_label":"Databricks Medium","query_id":10,"query_label":"Q10","rt_hot":3.706}
+{"id":"06","system":"Databricks","tier":"premium","compute_model":null,"bar_label":"Databricks Large","query_id":10,"query_label":"Q10","rt_hot":3.691}
+{"id":"07","system":"Databricks","tier":"premium","compute_model":null,"bar_label":"Databricks 4X-Large","query_id":10,"query_label":"Q10","rt_hot":4.659}
+{"id":"08","system":"BigQuery","tier":"Enterprise","compute_model":"capacity","bar_label":"BigQuery 2000 slots","query_id":10,"query_label":"Q10","rt_hot":1.258}
+{"id":"09","system":"Redshift","tier":"Standard","compute_model":"capacity","bar_label":"Redshift Serverless 128 RPU","query_id":10,"query_label":"Q10","rt_hot":1.656}
+{"id":"01","system":"ClickHouse","tier":"Enterprise","compute_model":null,"bar_label":"ClickHouse 1 x 59 Cores","query_id":11,"query_label":"Q11","rt_hot":0.215}
+{"id":"02","system":"Snowflake","tier":"enterprise","compute_model":null,"bar_label":"Snowflake Medium","query_id":11,"query_label":"Q11","rt_hot":0.205}
+{"id":"03","system":"Snowflake","tier":"enterprise","compute_model":null,"bar_label":"Snowflake Large","query_id":11,"query_label":"Q11","rt_hot":0.212}
+{"id":"04","system":"Snowflake","tier":"enterprise","compute_model":null,"bar_label":"Snowflake 4X-L","query_id":11,"query_label":"Q11","rt_hot":0.326}
+{"id":"05","system":"Databricks","tier":"premium","compute_model":null,"bar_label":"Databricks Medium","query_id":11,"query_label":"Q11","rt_hot":0.355}
+{"id":"06","system":"Databricks","tier":"premium","compute_model":null,"bar_label":"Databricks Large","query_id":11,"query_label":"Q11","rt_hot":0.378}
+{"id":"07","system":"Databricks","tier":"premium","compute_model":null,"bar_label":"Databricks 4X-Large","query_id":11,"query_label":"Q11","rt_hot":0.341}
+{"id":"08","system":"BigQuery","tier":"Enterprise","compute_model":"capacity","bar_label":"BigQuery 2000 slots","query_id":11,"query_label":"Q11","rt_hot":0.353}
+{"id":"09","system":"Redshift","tier":"Standard","compute_model":"capacity","bar_label":"Redshift Serverless 128 RPU","query_id":11,"query_label":"Q11","rt_hot":0.183}
+{"id":"01","system":"ClickHouse","tier":"Enterprise","compute_model":null,"bar_label":"ClickHouse 1 x 59 Cores","query_id":12,"query_label":"Q12","rt_hot":0.881}
+{"id":"02","system":"Snowflake","tier":"enterprise","compute_model":null,"bar_label":"Snowflake Medium","query_id":12,"query_label":"Q12","rt_hot":0.167}
+{"id":"03","system":"Snowflake","tier":"enterprise","compute_model":null,"bar_label":"Snowflake Large","query_id":12,"query_label":"Q12","rt_hot":0.18}
+{"id":"04","system":"Snowflake","tier":"enterprise","compute_model":null,"bar_label":"Snowflake 4X-L","query_id":12,"query_label":"Q12","rt_hot":0.306}
+{"id":"05","system":"Databricks","tier":"premium","compute_model":null,"bar_label":"Databricks Medium","query_id":12,"query_label":"Q12","rt_hot":0.425}
+{"id":"06","system":"Databricks","tier":"premium","compute_model":null,"bar_label":"Databricks Large","query_id":12,"query_label":"Q12","rt_hot":0.426}
+{"id":"07","system":"Databricks","tier":"premium","compute_model":null,"bar_label":"Databricks 4X-Large","query_id":12,"query_label":"Q12","rt_hot":0.365}
+{"id":"08","system":"BigQuery","tier":"Enterprise","compute_model":"capacity","bar_label":"BigQuery 2000 slots","query_id":12,"query_label":"Q12","rt_hot":0.519}
+{"id":"09","system":"Redshift","tier":"Standard","compute_model":"capacity","bar_label":"Redshift Serverless 128 RPU","query_id":12,"query_label":"Q12","rt_hot":1.656}
+{"id":"01","system":"ClickHouse","tier":"Enterprise","compute_model":null,"bar_label":"ClickHouse 1 x 59 Cores","query_id":13,"query_label":"Q13","rt_hot":0.846}
+{"id":"02","system":"Snowflake","tier":"enterprise","compute_model":null,"bar_label":"Snowflake Medium","query_id":13,"query_label":"Q13","rt_hot":3.479}
+{"id":"03","system":"Snowflake","tier":"enterprise","compute_model":null,"bar_label":"Snowflake Large","query_id":13,"query_label":"Q13","rt_hot":2.187}
+{"id":"04","system":"Snowflake","tier":"enterprise","compute_model":null,"bar_label":"Snowflake 4X-L","query_id":13,"query_label":"Q13","rt_hot":0.784}
+{"id":"05","system":"Databricks","tier":"premium","compute_model":null,"bar_label":"Databricks Medium","query_id":13,"query_label":"Q13","rt_hot":3.218}
+{"id":"06","system":"Databricks","tier":"premium","compute_model":null,"bar_label":"Databricks Large","query_id":13,"query_label":"Q13","rt_hot":2.29}
+{"id":"07","system":"Databricks","tier":"premium","compute_model":null,"bar_label":"Databricks 4X-Large","query_id":13,"query_label":"Q13","rt_hot":2.232}
+{"id":"08","system":"BigQuery","tier":"Enterprise","compute_model":"capacity","bar_label":"BigQuery 2000 slots","query_id":13,"query_label":"Q13","rt_hot":1.026}
+{"id":"09","system":"Redshift","tier":"Standard","compute_model":"capacity","bar_label":"Redshift Serverless 128 RPU","query_id":13,"query_label":"Q13","rt_hot":0.577}
+{"id":"01","system":"ClickHouse","tier":"Enterprise","compute_model":null,"bar_label":"ClickHouse 1 x 59 Cores","query_id":14,"query_label":"Q14","rt_hot":0.519}
+{"id":"02","system":"Snowflake","tier":"enterprise","compute_model":null,"bar_label":"Snowflake Medium","query_id":14,"query_label":"Q14","rt_hot":0.782}
+{"id":"03","system":"Snowflake","tier":"enterprise","compute_model":null,"bar_label":"Snowflake Large","query_id":14,"query_label":"Q14","rt_hot":0.841}
+{"id":"04","system":"Snowflake","tier":"enterprise","compute_model":null,"bar_label":"Snowflake 4X-L","query_id":14,"query_label":"Q14","rt_hot":0.798}
+{"id":"05","system":"Databricks","tier":"premium","compute_model":null,"bar_label":"Databricks Medium","query_id":14,"query_label":"Q14","rt_hot":1.24}
+{"id":"06","system":"Databricks","tier":"premium","compute_model":null,"bar_label":"Databricks Large","query_id":14,"query_label":"Q14","rt_hot":1.858}
+{"id":"07","system":"Databricks","tier":"premium","compute_model":null,"bar_label":"Databricks 4X-Large","query_id":14,"query_label":"Q14","rt_hot":1.423}
+{"id":"08","system":"BigQuery","tier":"Enterprise","compute_model":"capacity","bar_label":"BigQuery 2000 slots","query_id":14,"query_label":"Q14","rt_hot":0.338}
+{"id":"09","system":"Redshift","tier":"Standard","compute_model":"capacity","bar_label":"Redshift Serverless 128 RPU","query_id":14,"query_label":"Q14","rt_hot":0.337}
+{"id":"01","system":"ClickHouse","tier":"Enterprise","compute_model":null,"bar_label":"ClickHouse 1 x 59 Cores","query_id":15,"query_label":"Q15","rt_hot":0.999}
+{"id":"02","system":"Snowflake","tier":"enterprise","compute_model":null,"bar_label":"Snowflake Medium","query_id":15,"query_label":"Q15","rt_hot":1.259}
+{"id":"03","system":"Snowflake","tier":"enterprise","compute_model":null,"bar_label":"Snowflake Large","query_id":15,"query_label":"Q15","rt_hot":1.054}
+{"id":"04","system":"Snowflake","tier":"enterprise","compute_model":null,"bar_label":"Snowflake 4X-L","query_id":15,"query_label":"Q15","rt_hot":0.892}
+{"id":"05","system":"Databricks","tier":"premium","compute_model":null,"bar_label":"Databricks Medium","query_id":15,"query_label":"Q15","rt_hot":2.406}
+{"id":"06","system":"Databricks","tier":"premium","compute_model":null,"bar_label":"Databricks Large","query_id":15,"query_label":"Q15","rt_hot":2.049}
+{"id":"07","system":"Databricks","tier":"premium","compute_model":null,"bar_label":"Databricks 4X-Large","query_id":15,"query_label":"Q15","rt_hot":1.609}
+{"id":"08","system":"BigQuery","tier":"Enterprise","compute_model":"capacity","bar_label":"BigQuery 2000 slots","query_id":15,"query_label":"Q15","rt_hot":0.415}
+{"id":"09","system":"Redshift","tier":"Standard","compute_model":"capacity","bar_label":"Redshift Serverless 128 RPU","query_id":15,"query_label":"Q15","rt_hot":0.752}
+{"id":"01","system":"ClickHouse","tier":"Enterprise","compute_model":null,"bar_label":"ClickHouse 1 x 59 Cores","query_id":16,"query_label":"Q16","rt_hot":0.213}
+{"id":"02","system":"Snowflake","tier":"enterprise","compute_model":null,"bar_label":"Snowflake Medium","query_id":16,"query_label":"Q16","rt_hot":2.896}
+{"id":"03","system":"Snowflake","tier":"enterprise","compute_model":null,"bar_label":"Snowflake Large","query_id":16,"query_label":"Q16","rt_hot":2.388}
+{"id":"04","system":"Snowflake","tier":"enterprise","compute_model":null,"bar_label":"Snowflake 4X-L","query_id":16,"query_label":"Q16","rt_hot":2.554}
+{"id":"05","system":"Databricks","tier":"premium","compute_model":null,"bar_label":"Databricks Medium","query_id":16,"query_label":"Q16","rt_hot":1.601}
+{"id":"06","system":"Databricks","tier":"premium","compute_model":null,"bar_label":"Databricks Large","query_id":16,"query_label":"Q16","rt_hot":1.753}
+{"id":"07","system":"Databricks","tier":"premium","compute_model":null,"bar_label":"Databricks 4X-Large","query_id":16,"query_label":"Q16","rt_hot":1.818}
+{"id":"08","system":"BigQuery","tier":"Enterprise","compute_model":"capacity","bar_label":"BigQuery 2000 slots","query_id":16,"query_label":"Q16","rt_hot":1.216}
+{"id":"09","system":"Redshift","tier":"Standard","compute_model":"capacity","bar_label":"Redshift Serverless 128 RPU","query_id":16,"query_label":"Q16","rt_hot":0.305}
+{"id":"01","system":"ClickHouse","tier":"Enterprise","compute_model":null,"bar_label":"ClickHouse 1 x 59 Cores","query_id":17,"query_label":"Q17","rt_hot":0.804}
+{"id":"02","system":"Snowflake","tier":"enterprise","compute_model":null,"bar_label":"Snowflake Medium","query_id":17,"query_label":"Q17","rt_hot":0.199}
+{"id":"03","system":"Snowflake","tier":"enterprise","compute_model":null,"bar_label":"Snowflake Large","query_id":17,"query_label":"Q17","rt_hot":0.173}
+{"id":"04","system":"Snowflake","tier":"enterprise","compute_model":null,"bar_label":"Snowflake 4X-L","query_id":17,"query_label":"Q17","rt_hot":0.185}
+{"id":"05","system":"Databricks","tier":"premium","compute_model":null,"bar_label":"Databricks Medium","query_id":17,"query_label":"Q17","rt_hot":0.375}
+{"id":"06","system":"Databricks","tier":"premium","compute_model":null,"bar_label":"Databricks Large","query_id":17,"query_label":"Q17","rt_hot":0.378}
+{"id":"07","system":"Databricks","tier":"premium","compute_model":null,"bar_label":"Databricks 4X-Large","query_id":17,"query_label":"Q17","rt_hot":0.361}
+{"id":"08","system":"BigQuery","tier":"Enterprise","compute_model":"capacity","bar_label":"BigQuery 2000 slots","query_id":17,"query_label":"Q17","rt_hot":0.835}
+{"id":"09","system":"Redshift","tier":"Standard","compute_model":"capacity","bar_label":"Redshift Serverless 128 RPU","query_id":17,"query_label":"Q17","rt_hot":0.573}
+{"id":"01","system":"ClickHouse","tier":"Enterprise","compute_model":null,"bar_label":"ClickHouse 1 x 59 Cores","query_id":18,"query_label":"Q18","rt_hot":1.231}
+{"id":"02","system":"Snowflake","tier":"enterprise","compute_model":null,"bar_label":"Snowflake Medium","query_id":18,"query_label":"Q18","rt_hot":4.741}
+{"id":"03","system":"Snowflake","tier":"enterprise","compute_model":null,"bar_label":"Snowflake Large","query_id":18,"query_label":"Q18","rt_hot":2.217}
+{"id":"04","system":"Snowflake","tier":"enterprise","compute_model":null,"bar_label":"Snowflake 4X-L","query_id":18,"query_label":"Q18","rt_hot":1.205}
+{"id":"05","system":"Databricks","tier":"premium","compute_model":null,"bar_label":"Databricks Medium","query_id":18,"query_label":"Q18","rt_hot":3.818}
+{"id":"06","system":"Databricks","tier":"premium","compute_model":null,"bar_label":"Databricks Large","query_id":18,"query_label":"Q18","rt_hot":2.647}
+{"id":"07","system":"Databricks","tier":"premium","compute_model":null,"bar_label":"Databricks 4X-Large","query_id":18,"query_label":"Q18","rt_hot":2.156}
+{"id":"08","system":"BigQuery","tier":"Enterprise","compute_model":"capacity","bar_label":"BigQuery 2000 slots","query_id":18,"query_label":"Q18","rt_hot":3.804}
+{"id":"09","system":"Redshift","tier":"Standard","compute_model":"capacity","bar_label":"Redshift Serverless 128 RPU","query_id":18,"query_label":"Q18","rt_hot":3.602}
+{"id":"01","system":"ClickHouse","tier":"Enterprise","compute_model":null,"bar_label":"ClickHouse 1 x 59 Cores","query_id":19,"query_label":"Q19","rt_hot":0.854}
+{"id":"02","system":"Snowflake","tier":"enterprise","compute_model":null,"bar_label":"Snowflake Medium","query_id":19,"query_label":"Q19","rt_hot":0.185}
+{"id":"03","system":"Snowflake","tier":"enterprise","compute_model":null,"bar_label":"Snowflake Large","query_id":19,"query_label":"Q19","rt_hot":0.184}
+{"id":"04","system":"Snowflake","tier":"enterprise","compute_model":null,"bar_label":"Snowflake 4X-L","query_id":19,"query_label":"Q19","rt_hot":0.188}
+{"id":"05","system":"Databricks","tier":"premium","compute_model":null,"bar_label":"Databricks Medium","query_id":19,"query_label":"Q19","rt_hot":0.378}
+{"id":"06","system":"Databricks","tier":"premium","compute_model":null,"bar_label":"Databricks Large","query_id":19,"query_label":"Q19","rt_hot":0.369}
+{"id":"07","system":"Databricks","tier":"premium","compute_model":null,"bar_label":"Databricks 4X-Large","query_id":19,"query_label":"Q19","rt_hot":0.351}
+{"id":"08","system":"BigQuery","tier":"Enterprise","compute_model":"capacity","bar_label":"BigQuery 2000 slots","query_id":19,"query_label":"Q19","rt_hot":0.472}
+{"id":"09","system":"Redshift","tier":"Standard","compute_model":"capacity","bar_label":"Redshift Serverless 128 RPU","query_id":19,"query_label":"Q19","rt_hot":1.362}
+{"id":"01","system":"ClickHouse","tier":"Enterprise","compute_model":null,"bar_label":"ClickHouse 1 x 59 Cores","query_id":20,"query_label":"Q20","rt_hot":0.988}
+{"id":"02","system":"Snowflake","tier":"enterprise","compute_model":null,"bar_label":"Snowflake Medium","query_id":20,"query_label":"Q20","rt_hot":0.193}
+{"id":"03","system":"Snowflake","tier":"enterprise","compute_model":null,"bar_label":"Snowflake Large","query_id":20,"query_label":"Q20","rt_hot":0.188}
+{"id":"04","system":"Snowflake","tier":"enterprise","compute_model":null,"bar_label":"Snowflake 4X-L","query_id":20,"query_label":"Q20","rt_hot":0.324}
+{"id":"05","system":"Databricks","tier":"premium","compute_model":null,"bar_label":"Databricks Medium","query_id":20,"query_label":"Q20","rt_hot":0.502}
+{"id":"06","system":"Databricks","tier":"premium","compute_model":null,"bar_label":"Databricks Large","query_id":20,"query_label":"Q20","rt_hot":0.485}
+{"id":"07","system":"Databricks","tier":"premium","compute_model":null,"bar_label":"Databricks 4X-Large","query_id":20,"query_label":"Q20","rt_hot":0.474}
+{"id":"08","system":"BigQuery","tier":"Enterprise","compute_model":"capacity","bar_label":"BigQuery 2000 slots","query_id":20,"query_label":"Q20","rt_hot":1.411}
+{"id":"09","system":"Redshift","tier":"Standard","compute_model":"capacity","bar_label":"Redshift Serverless 128 RPU","query_id":20,"query_label":"Q20","rt_hot":0.611}
+{"id":"01","system":"ClickHouse","tier":"Enterprise","compute_model":null,"bar_label":"ClickHouse 1 x 59 Cores","query_id":21,"query_label":"Q21","rt_hot":2.325}
+{"id":"02","system":"Snowflake","tier":"enterprise","compute_model":null,"bar_label":"Snowflake Medium","query_id":21,"query_label":"Q21","rt_hot":0.208}
+{"id":"03","system":"Snowflake","tier":"enterprise","compute_model":null,"bar_label":"Snowflake Large","query_id":21,"query_label":"Q21","rt_hot":0.216}
+{"id":"04","system":"Snowflake","tier":"enterprise","compute_model":null,"bar_label":"Snowflake 4X-L","query_id":21,"query_label":"Q21","rt_hot":0.304}
+{"id":"05","system":"Databricks","tier":"premium","compute_model":null,"bar_label":"Databricks Medium","query_id":21,"query_label":"Q21","rt_hot":0.397}
+{"id":"06","system":"Databricks","tier":"premium","compute_model":null,"bar_label":"Databricks Large","query_id":21,"query_label":"Q21","rt_hot":0.398}
+{"id":"07","system":"Databricks","tier":"premium","compute_model":null,"bar_label":"Databricks 4X-Large","query_id":21,"query_label":"Q21","rt_hot":0.383}
+{"id":"08","system":"BigQuery","tier":"Enterprise","compute_model":"capacity","bar_label":"BigQuery 2000 slots","query_id":21,"query_label":"Q21","rt_hot":2.882}
+{"id":"09","system":"Redshift","tier":"Standard","compute_model":"capacity","bar_label":"Redshift Serverless 128 RPU","query_id":21,"query_label":"Q21","rt_hot":7.698}
+{"id":"01","system":"ClickHouse","tier":"Enterprise","compute_model":null,"bar_label":"ClickHouse 1 x 59 Cores","query_id":22,"query_label":"Q22","rt_hot":0.44}
+{"id":"02","system":"Snowflake","tier":"enterprise","compute_model":null,"bar_label":"Snowflake Medium","query_id":22,"query_label":"Q22","rt_hot":0.772}
+{"id":"03","system":"Snowflake","tier":"enterprise","compute_model":null,"bar_label":"Snowflake Large","query_id":22,"query_label":"Q22","rt_hot":0.666}
+{"id":"04","system":"Snowflake","tier":"enterprise","compute_model":null,"bar_label":"Snowflake 4X-L","query_id":22,"query_label":"Q22","rt_hot":0.838}
+{"id":"05","system":"Databricks","tier":"premium","compute_model":null,"bar_label":"Databricks Medium","query_id":22,"query_label":"Q22","rt_hot":1.371}
+{"id":"06","system":"Databricks","tier":"premium","compute_model":null,"bar_label":"Databricks Large","query_id":22,"query_label":"Q22","rt_hot":1.538}
+{"id":"07","system":"Databricks","tier":"premium","compute_model":null,"bar_label":"Databricks 4X-Large","query_id":22,"query_label":"Q22","rt_hot":1.113}
+{"id":"08","system":"BigQuery","tier":"Enterprise","compute_model":"capacity","bar_label":"BigQuery 2000 slots","query_id":22,"query_label":"Q22","rt_hot":0.523}
+{"id":"09","system":"Redshift","tier":"Standard","compute_model":"capacity","bar_label":"Redshift Serverless 128 RPU","query_id":22,"query_label":"Q22","rt_hot":0.658}
