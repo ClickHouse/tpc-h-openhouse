@@ -42,6 +42,7 @@ snowsql \
 echo "→ Verifying warehouses ..." >&2
 
 for wh in \
+  BENCH2COST_SMALL_GEN2 \
   BENCH2COST_MEDIUM \
   BENCH2COST_MEDIUM_GEN2 \
   BENCH2COST_LARGE \

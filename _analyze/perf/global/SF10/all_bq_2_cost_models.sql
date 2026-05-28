@@ -2,33 +2,44 @@ WITH
 sel AS
 (
 
-  SELECT '01' AS id, 'ClickHouse 1 x 59 Cores' AS bar_label, 'ClickHouse%' AS system_pat,
+
+   SELECT '01' AS id, 'ClickHouse 1 x 59 Cores' AS bar_label, 'ClickHouse%' AS system_pat,
            'Enterprise' AS tier, 'default' AS compute_model,
            'aws' AS provider, 'us-east-1' AS region, '236GiB' AS machine, '1' AS cluster_size
 
+       UNION ALL
+    SELECT '02' AS id, 'Snowflake Small' AS bar_label, 'Snowflake%' AS system_pat,
+           'enterprise' AS tier, NULL AS compute_model,
+           'aws' AS provider, 'us-east-1' AS region, 'Gen2 Small' AS machine, '2.7' AS cluster_size
+
 
     UNION ALL
-    SELECT '02' AS id, 'Snowflake Medium' AS bar_label, 'Snowflake%' AS system_pat,
+    SELECT '03' AS id, 'Snowflake Medium' AS bar_label, 'Snowflake%' AS system_pat,
            'enterprise' AS tier, NULL AS compute_model,
            'aws' AS provider, 'us-east-1' AS region, 'Gen2 Medium' AS machine, '5.4' AS cluster_size
 
     UNION ALL
-    SELECT '03' AS id, 'Snowflake Large' AS bar_label, 'Snowflake%' AS system_pat,
+    SELECT '04' AS id, 'Snowflake Large' AS bar_label, 'Snowflake%' AS system_pat,
            'enterprise' AS tier, NULL AS compute_model,
            'aws' AS provider, 'us-east-1' AS region, 'Gen2 Large' AS machine, '10.8' AS cluster_size
 
     UNION ALL
-    SELECT '04' AS id, 'Snowflake 4X-L' AS bar_label, 'Snowflake%' AS system_pat,
+    SELECT '05' AS id, 'Snowflake 4X-L' AS bar_label, 'Snowflake%' AS system_pat,
            'enterprise' AS tier, NULL AS compute_model,
            'aws' AS provider, 'us-east-1' AS region, 'Gen2 4X-Large' AS machine, '172.8' AS cluster_size
 
+            UNION ALL
+    SELECT '06' AS id, 'Databricks Small' AS bar_label, 'Databricks%' AS system_pat,
+           'premium' AS tier, NULL AS compute_model,
+           'aws' AS provider, 'us-east-1' AS region, 'serverless' AS machine, 'Small' AS cluster_size
+
         UNION ALL
-    SELECT '05' AS id, 'Databricks Medium' AS bar_label, 'Databricks%' AS system_pat,
+    SELECT '07' AS id, 'Databricks Medium' AS bar_label, 'Databricks%' AS system_pat,
            'premium' AS tier, NULL AS compute_model,
            'aws' AS provider, 'us-east-1' AS region, 'serverless' AS machine, 'Medium' AS cluster_size
 
     UNION ALL
-        SELECT '06' AS id, 'Databricks Large' AS bar_label, 'Databricks%' AS system_pat,
+        SELECT '08' AS id, 'Databricks Large' AS bar_label, 'Databricks%' AS system_pat,
            'premium' AS tier, NULL AS compute_model,
            'aws' AS provider, 'us-east-1' AS region, 'serverless' AS machine, 'Large' AS cluster_size
 
@@ -38,25 +49,23 @@ sel AS
 --         'premium' AS tier, NULL AS compute_model, 'aws' AS provider, 'us-east-1' AS region, 'serverless' AS machine, 'X-Large' AS cluster_size
 
     UNION ALL
-    SELECT '07' AS id, 'Databricks 4X-Large' AS bar_label, 'Databricks%' AS system_pat,
+    SELECT '09' AS id, 'Databricks 4X-Large' AS bar_label, 'Databricks%' AS system_pat,
            'premium' AS tier, NULL AS compute_model,
            'aws' AS provider, 'us-east-1' AS region, 'serverless' AS machine, '4X-Large' AS cluster_size
 
     UNION ALL
-    SELECT '08' AS id, 'BigQuery 2000 slots' AS bar_label, 'Bigquery' AS system_pat,
+    SELECT '10' AS id, 'BigQuery 2000 slots' AS bar_label, 'Bigquery' AS system_pat,
            'Enterprise' AS tier, 'capacity' AS compute_model,
            'gcp' AS provider, 'us-east-1' AS region, 'serverless' AS machine, 'serverless' AS cluster_size
 
        UNION ALL
-    SELECT '09' AS id, 'BigQuery On-demand' AS bar_label, 'Bigquery' AS system_pat,
+    SELECT '11' AS id, 'BigQuery On-demand' AS bar_label, 'Bigquery' AS system_pat,
            'OnDemand' AS tier, 'on_demand' AS compute_model,
            'gcp' AS provider, 'us-east-1' AS region, 'serverless' AS machine, 'serverless' AS cluster_size
     UNION ALL
-    SELECT '10' AS id, 'Redshift Serverless 128 RPU' AS bar_label, 'Redshift%' AS system_pat,
+    SELECT '12' AS id, 'Redshift Serverless 128 RPU' AS bar_label, 'Redshift%' AS system_pat,
            'Standard' AS tier, 'capacity' AS compute_model,
            'aws' AS provider, 'us-east-1' AS region, 'serverless' AS machine, 'serverless' AS cluster_size
-
-
 
 
 ),

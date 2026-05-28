@@ -25,8 +25,22 @@ python summarize_results.py \
 
 
 
+./load_scale.py sf10
+
+
 mkdir -p results_sf10
 mkdir -p results_enriched_sf10
+
+
+
+./run_full.sh sf10 "Small" 12 results_sf10/databricks_sf10_Small.json
+./enrich.sh  results_sf10/databricks_sf10_Small.json \
+            pricings/sql_serverless_compute.json \
+            results_enriched_sf10/databricks_sf10_Small_enriched.json \
+            --cloud aws --region us-east-1 --plan premium
+
+
+
 
 
 ./run_full.sh sf10 "4X-Large" 528 results_sf10/databricks_sf10_4xlarge.json
@@ -72,9 +86,21 @@ mkdir -p results_enriched_sf10
 
 
 ./load_scale.py sf100
-./run_full.sh sf100 "4X-Large" 528 results_sf100/databricks_sf100_4xlarge.json
 
+
+mkdir -p results_sf100
 mkdir -p results_enriched_sf100
+
+
+./run_full.sh sf100 "Small" 12 results_sf100/databricks_sf100_Small.json
+./enrich.sh  results_sf100/databricks_sf100_Small.json \
+            pricings/sql_serverless_compute.json \
+            results_enriched_sf100/databricks_sf100_Small_enriched.json \
+            --cloud aws --region us-east-1 --plan premium
+
+
+
+./run_full.sh sf100 "4X-Large" 528 results_sf100/databricks_sf100_4xlarge.json
 ./enrich.sh  results_sf100/databricks_sf100_4xlarge.json \
             pricings/sql_serverless_compute.json \
             results_enriched_sf100/databricks_sf100_4xlarge_enriched.json \
@@ -115,10 +141,11 @@ mkdir -p results_enriched_sf100
 
 
 ./load_scale.py sf1000
-./run_full.sh sf1000 "4X-Large" 528 results_sf1000/databricks_sf1000_4xlarge.json
 
+mkdir -p results_sf1000
 mkdir -p results_enriched_sf1000
 
+./run_full.sh sf1000 "4X-Large" 528 results_sf1000/databricks_sf1000_4xlarge.json
 ./enrich.sh  results_sf1000/databricks_sf1000_4xlarge.json \
             pricings/sql_serverless_compute.json \
             results_enriched_sf1000/databricks_sf1000_4xlarge_enriched.json \
