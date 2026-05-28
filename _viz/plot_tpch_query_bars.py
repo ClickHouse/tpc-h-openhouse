@@ -19,9 +19,11 @@ VENDOR_COLOR = {
 # This controls bar order within each query panel.
 BAR_ORDER = [
     "ClickHouse 1 x 59 Cores",
+    "Snowflake Small",
     "Snowflake Medium",
     "Snowflake Large",
     "Snowflake 4X-L",
+    "Databricks Small",
     "Databricks Medium",
     "Databricks Large",
     "Databricks 4X-Large",
@@ -33,9 +35,11 @@ SHORT_LABEL = {
     "ClickHouse 1 x 59 Cores": "CH\n1x59C",
     "BigQuery 2000 slots": "BQ",
     "Redshift Serverless 128 RPU": "RS",
+    "Snowflake Small": "SF\nS",
     "Snowflake Medium": "SF\nM",
     "Snowflake Large": "SF\nL",
     "Snowflake 4X-L": "SF\n4XL",
+    "Databricks Small": "DB\nS",
     "Databricks Medium": "DB\nM",
     "Databricks Large": "DB\nL",
     "Databricks 4X-Large": "DB\n4XL",
