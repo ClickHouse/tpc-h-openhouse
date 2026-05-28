@@ -98,7 +98,20 @@ python cost_per_dollar.py --no-title \
   < ./_results/global/sf10_all_bq_2_cost_models.ndjson
 
 
+
+python cost_per_dollar_horizontal.py --no-title \
+  --out ./_out/factor_sf10.png \
+  < ./_results/global/sf10_all_bq_2_cost_models.ndjson
+
+
+
 python cost_per_dollar.py --no-title \
+  --out ./_out/factor_sf100.png \
+  < ./_results/global/sf100_all_bq_2_cost_models.ndjson
+
+
+
+python cost_per_dollar_horizontal.py --no-title \
   --out ./_out/factor_sf100.png \
   < ./_results/global/sf100_all_bq_2_cost_models.ndjson
 
