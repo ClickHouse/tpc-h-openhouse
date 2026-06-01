@@ -1,0 +1,5 @@
+{"id":"01","system":"ClickHouse","tier":"Enterprise","compute_model":null,"bar_label":"ClickHouse 1 x 59 Cores","rt_hot":2.909,"cost_hot":0.0093}
+{"id":"06","system":"Databricks","tier":"premium","compute_model":null,"bar_label":"Databricks Small","rt_hot":17.442,"cost_hot":0.0407}
+{"id":"07","system":"Databricks","tier":"premium","compute_model":null,"bar_label":"Databricks Medium","rt_hot":17.97,"cost_hot":0.08386}
+{"id":"08","system":"Databricks","tier":"premium","compute_model":null,"bar_label":"Databricks Large","rt_hot":17.512,"cost_hot":0.1362}
+{"id":"09","system":"Databricks","tier":"premium","compute_model":null,"bar_label":"Databricks 4X-Large","rt_hot":18.495,"cost_hot":1.89882}

@@ -1,0 +1,5 @@
+{"id":"01","system":"ClickHouse","tier":"Enterprise","compute_model":null,"bar_label":"59 Cores","rt_hot":19.806,"cost_hot":0.06335}
+{"id":"06","system":"Databricks","tier":"premium","compute_model":null,"bar_label":"Small","rt_hot":37.29,"cost_hot":0.08701}
+{"id":"07","system":"Databricks","tier":"premium","compute_model":null,"bar_label":"Medium","rt_hot":39.984,"cost_hot":0.18659}
+{"id":"08","system":"Databricks","tier":"premium","compute_model":null,"bar_label":"Large","rt_hot":28.855,"cost_hot":0.22443}
+{"id":"09","system":"Databricks","tier":"premium","compute_model":null,"bar_label":"4X-Large","rt_hot":26.434,"cost_hot":2.71389}
