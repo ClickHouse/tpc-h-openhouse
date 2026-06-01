@@ -49,7 +49,8 @@ CLIENT_CONFIG="${CLIENT_CONFIG:-$SCRIPT_DIR/clickhouse-client.xml}"
 # Default SET statement applied to EVERY query (baseline and DQP runs alike).
 # Edit / extend the SQL below in-place — no env var or CLI flag needed.
 # Leave as an empty string to disable the default prefix entirely.
-DEFAULT_SETTINGS_SQL="SET enable_parallel_replicas = 0; "
+#DEFAULT_SETTINGS_SQL="SET enable_parallel_replicas = 0, max_bytes_before_external_join = '4G'; "
+DEFAULT_SETTINGS_SQL="SET enable_parallel_replicas = 0 ; "
 
 # Extra SET statement appended after DEFAULT_SETTINGS_SQL when DQP_FLAG=1.
 DQP_SETTINGS_SQL="SET make_distributed_plan=1, enable_parallel_replicas=0, \
@@ -96,7 +97,9 @@ fi
 # retries), then move on to the next query so the rest of the suite still
 # completes.
 FAIL_LOG="$(mktemp -t ch_bench_fail.XXXXXX)"
-trap 'rm -f "$FAIL_LOG"' EXIT
+# Per-try memory log (one line per successful try: "<query> <try> <bytes> <human>")
+MEM_LOG="$(mktemp -t ch_bench_mem.XXXXXX)"
+trap 'rm -f "$FAIL_LOG" "$MEM_LOG"' EXIT
 
 RESULT_RAW="$(
 for f in "${QUERY_FILES[@]}"; do
@@ -106,6 +109,8 @@ for f in "${QUERY_FILES[@]}"; do
     echo "Running ${name}..." >&2
     echo -n "["
     ARRAY_VALUES=()
+    mem_peak_bytes=0
+    mem_peak_display="N/A"
     failed=0
     for i in $(seq 1 $TRIES); do
         if (( failed == 1 )); then
@@ -120,7 +125,8 @@ for f in "${QUERY_FILES[@]}"; do
         tmp_out="$(mktemp -t ch_bench_out.XXXXXX)"
         set +e
         "$CLIENT_BIN" client -c "$CLIENT_CONFIG" --database "$DATASET" \
-          --time --format=Null --progress 0 --multiquery \
+          --time --memory-usage=default \
+          --format=Null --progress 0 --multiquery \
           --query="$full_query" >"$tmp_out" 2>&1
         rc=$?
         set -e
@@ -147,6 +153,24 @@ for f in "${QUERY_FILES[@]}"; do
               echo
             } >&2
             echo "${name} run ${i}/${TRIES} FAILED (${err_reason})" >> "$FAIL_LOG"
+        else
+            # With --memory-usage=default the client prints peak bytes as a
+            # bare integer line (one per statement when --multiquery). Timings
+            # appear as decimal lines (handled above). Take the largest int
+            # as this run peak memory.
+            cur_bytes=$(awk '
+                /^[0-9]+$/ { b = $1 + 0; if (b > maxb) maxb = b }
+                END { printf "%.0f\n", (maxb ? maxb : 0) }
+            ' "$tmp_out")
+            cur_display=$(awk -v b="$cur_bytes" \
+                'BEGIN { printf "%.3f GiB", b / (1024*1024*1024) }')
+
+            # Update per-query peak.
+            if [[ "$cur_bytes" != "0" ]] && (( cur_bytes > mem_peak_bytes )); then
+                mem_peak_bytes=$cur_bytes
+                mem_peak_display=$cur_display
+            fi
+            echo "${name} ${i} ${cur_bytes}" >> "$MEM_LOG"
         fi
 
         rm -f "$tmp_out"
@@ -156,7 +180,7 @@ for f in "${QUERY_FILES[@]}"; do
         [[ "$i" != $TRIES ]] && echo -n ", "
     done
     echo "],"
-    echo "→ [${ARRAY_VALUES[*]}]" >&2
+    echo "→ [${ARRAY_VALUES[*]}]  peak_mem=${mem_peak_display}" >&2
 done
 )"
 
@@ -254,5 +278,29 @@ else
   TOTAL_FMT=$(awk -v t="$TOTAL_SEC" 'BEGIN { printf "%.3f", t }')
   printf "Total time:  %s sec  (sum of best times across %d/%d queries)\n" \
     "$TOTAL_FMT" "$N_VALID" "$N_QUERIES" >&2
+fi
+
+if [[ -s "$MEM_LOG" ]]; then
+  max_info=$(awk '
+    {
+      q = $1; t = $2; b = $3 + 0
+      if (b > maxb) { maxb = b; maxq = q; maxt = t }
+    }
+    END {
+      if (maxb > 0) printf "%.3f|%s|%s\n", maxb / (1024*1024*1024), maxq, maxt
+      else printf "N/A||\n"
+    }
+  ' "$MEM_LOG")
+  max_str=${max_info%%|*}
+  rest=${max_info#*|}
+  max_query=${rest%%|*}
+  max_try=${rest##*|}
+  if [[ "$max_str" == "N/A" ]]; then
+    echo "Max memory:  N/A" >&2
+  else
+    printf "Max memory:  %s GiB  (at %s, try %s)\n" "$max_str" "$max_query" "$max_try" >&2
+  fi
+else
+  echo "Max memory:  N/A (no memory data captured)" >&2
 fi
 echo "============================================================" >&2
